@@ -17,8 +17,8 @@ class HomeState extends State<Home>  {
     super.initState();
   }
 
-  Widget changWidget(){
-
+  /// 页面主题
+  Widget _changBodyWidget(){
     switch(_currentIndex){
       case 0: return Bookshelf();
       case 1: return Text("t1");
@@ -27,13 +27,27 @@ class HomeState extends State<Home>  {
       default: return null;
     }
   }
+  /// 标题
+  AppBar _changAppBarWidget(){
+    String title;
+    switch(_currentIndex){
+      case 0: title="书架"; break;
+      case 1: title="书城"; break;
+      case 2: title="发现"; break;
+      case 3: title="我的"; break;
+      default: title =  "";
+    }
+    return AppBar(backgroundColor:Colors.blue,title: Text(title),);
+  }
 
   @override
   Widget build(BuildContext context) {
    return MaterialApp(
      home: Scaffold(
+       appBar: _changAppBarWidget(),
+       backgroundColor:Colors.grey[300],
        body: Center(
-         child:changWidget(),
+         child:_changBodyWidget(),
        ),
        bottomNavigationBar: Container(
          decoration: BoxDecoration(border:BorderDirectional(top:BorderSide(color: Colors.grey[500])) ),
