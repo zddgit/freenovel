@@ -70,7 +70,6 @@ class _DetailState extends State<Detail>{
 
 
   Widget _itemBuilder(BuildContext context, int index) {
-    print("_itemBuilder$index");
     currentIndex = index;
     Chapter chapter = chapters[index];
     return Card(

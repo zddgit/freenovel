@@ -89,18 +89,18 @@ class _BookshelfState extends State<Bookshelf> {
     return Card(
       child: ListTile(
         leading: Image.asset(
-          novel._imageUrl,
+          novel.imageUrl,
           height: 50.0,
           width: 50.0,
         ),
-        title: Text(novel._name),
-        subtitle: Text(novel._author),
+        title: Text(novel.name),
+        subtitle: Text(novel.author),
         trailing: Container(
             width: 150.0,
             height: 50.0,
             child: Center(
                 child: Text(
-              novel._introduction,
+              novel.introduction,
               style: TextStyle(
                   fontSize: 10.0,
                   fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class _BookshelfState extends State<Bookshelf> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ))),
-        onTap: () => _open(novel._id),
+        onTap: () => _open(novel.id),
         onLongPress: _showDialog,
       ),
     );
@@ -125,4 +125,16 @@ class Novel {
 
   Novel(this._id, this._imageUrl, this._name, this._author, this._introduction,
       this._recentReadTime);
+
+  int get id => _id;
+
+  String get imageUrl => _imageUrl;
+
+  String get name => _name;
+
+  String get author => _author;
+
+  String get introduction => _introduction;
+
+  DateTime get recentReadTime => _recentReadTime;
 }
