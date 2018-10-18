@@ -26,7 +26,7 @@ class _BookshelfState extends State<Bookshelf> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.blue, title: Text("书架")),
+      appBar: AppBar(backgroundColor: Colors.blue, title: Text("书架"),centerTitle: true,),
       body: ListView.builder(
           itemCount: novels == null ? 0 : novels.length,
           itemBuilder: _itemBuilder),
@@ -116,25 +116,14 @@ class _BookshelfState extends State<Bookshelf> {
 }
 
 class Novel {
-  final int _id;
-  final String _imageUrl;
-  final String _name;
-  final String _author;
-  final String _introduction;
-  final DateTime _recentReadTime;
+  final int id;
+  final String imageUrl;
+  final String name;
+  final String author;
+  final String introduction;
+  final DateTime recentReadTime;
 
-  Novel(this._id, this._imageUrl, this._name, this._author, this._introduction,
-      this._recentReadTime);
 
-  int get id => _id;
-
-  String get imageUrl => _imageUrl;
-
-  String get name => _name;
-
-  String get author => _author;
-
-  String get introduction => _introduction;
-
-  DateTime get recentReadTime => _recentReadTime;
+  Novel(this.id, this.imageUrl, this.name, this.author, this.introduction,
+      this.recentReadTime);
 }
