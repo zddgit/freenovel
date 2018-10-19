@@ -33,59 +33,55 @@ class _BookshelfState extends State<Bookshelf> {
     );
   }
 
+  void _open(int chapterIndex) {
+    Navigator.of(context).push(new PageRouteBuilder(
+        pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+          return new ChapterDetail(chapterIndex);},
+        transitionsBuilder: (BuildContext context, Animation<double> animation,Animation<double> secondaryAnimation, Widget child) {
+          return new FadeTransition(
+            opacity: animation,
+            child: new SlideTransition(
+              position: new Tween<Offset>(
+                begin: Offset(1.0, 0.0),
+                end: Offset(0.0, 0.0),
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        }));
+  }
+  void _showDialog(int index) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('你想删除吗？'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('确定'),
+              onPressed: () {
+                print("删除了$index");
+                Navigator.of(context).pop();
+                setState(() {
+                  novels.removeAt(index);
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _itemBuilder(BuildContext context, int index) {
     Novel novel = novels[index];
-
-    void _open(int chapterIndex) {
-      Navigator.of(context).push(new PageRouteBuilder(pageBuilder:
-          (BuildContext context, Animation<double> animation,
-              Animation<double> secondaryAnimation) {
-        return new Detail(chapterIndex);
-      }, transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget child) {
-        return new FadeTransition(
-          opacity: animation,
-          child: new SlideTransition(
-            position: new Tween<Offset>(
-              begin: Offset(1.0, 0.0),
-              end: Offset(0.0, 0.0),
-            ).animate(animation),
-            child: child,
-          ),
-        );
-      }));
-    }
-
-    void _showDialog() {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('你想删除吗？'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('确定'),
-                onPressed: () {
-                  print("删除了$index");
-                  Navigator.of(context).pop();
-                  setState(() {
-                    novels.removeAt(index);
-                  });
-                },
-              ),
-              FlatButton(
-                child: Text('取消'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     return Card(
       child: ListTile(
         leading: Image.asset(
@@ -109,7 +105,7 @@ class _BookshelfState extends State<Bookshelf> {
               overflow: TextOverflow.ellipsis,
             ))),
         onTap: () => _open(novel.id),
-        onLongPress: _showDialog,
+        onLongPress: ()=>_showDialog(index),
       ),
     );
   }
