@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -14,16 +15,20 @@ class ChapterDetail extends StatefulWidget {
 }
 
 class _ChapterDetailState extends State<ChapterDetail> {
+
+  /// 书籍得id
   final int id;
+  /// 目录章节内容
   List<Chapter> chapters;
+  List<Chapter> readChapters=[];
+  /// 当前章节id
+  int currentChapterId;
 
   _ChapterDetailState(this.id);
 
-  int currentIndex;
-
   @override
   void initState() {
-    // TODO: 初始化从缓存读取
+    // TODO: 初始化从缓存读取章节目录
     super.initState();
     chapters = <Chapter>[
       Chapter(
@@ -46,6 +51,7 @@ class _ChapterDetailState extends State<ChapterDetail> {
           "上古的烽烟早已在岁月中逝去，黄河古道虽然几经变迁，但依旧在。",
           "第2章")
     ];
+    readChapters.add(chapters.elementAt(currentChapterId??0));
   }
 
   @override
@@ -73,13 +79,9 @@ class _ChapterDetailState extends State<ChapterDetail> {
         ),
         body: Builder(builder: (BuildContext context) {
           return GestureDetector(
-            onLongPress: () {
-              // TODO 长按设置
-              print("onLongPress");
-              //Scaffold.of(context).openDrawer();
-            },
             onVerticalDragDown: (_) {
-              if (currentIndex == chapters.length - 1) {
+              // 当读到最后一章得时候进行加载
+              if (currentChapterId == readChapters.length - 1 && currentChapterId < chapters.length-1) {
                 Fluttertoast.showToast(
                     msg: "加载中……",
                     toastLength: Toast.LENGTH_SHORT,
@@ -88,48 +90,54 @@ class _ChapterDetailState extends State<ChapterDetail> {
                     bgcolor: "#777777",
                     textcolor: '#ffffff');
                 setState(() {
-                  chapters.add(Chapter(
+                  readChapters.add(Chapter(
                       1,
                       2,
                       "大漠孤烟直，长河落日圆。一望无垠的大漠，空旷而高远，壮阔而雄浑，当红日西坠，地平线尽头一片殷红，磅礴中亦有种苍凉感。",
-                      "第" + chapters.length.toString() + "章"));
+                      "第" + readChapters.length.toString() + "章"));
                 });
               }
             },
             child: ListView.builder(
-              itemCount: chapters == null ? 0 : chapters.length,
+              itemCount: readChapters == null ? 0 : readChapters.length,
               itemBuilder: _chapterContentitemBuilder,
             ),
           );
         }));
   }
 
+  /// 章节内容
   Widget _chapterContentitemBuilder(BuildContext context, int index) {
-    currentIndex = index;
-    Chapter chapter = chapters[index];
+    currentChapterId = index;
+    Chapter chapter = readChapters[index];
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(chapter.title + "\n    " + chapter.content,
           style: TextStyle(letterSpacing: 1.0, height: 1.2)),
     );
   }
+  /// 目录
   Widget _chapterTitleItemBuilder(BuildContext context, int index) {
-    currentIndex = index;
+    currentChapterId = index;
     Chapter chapter = chapters[index];
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
           decoration:BoxDecoration(border: Border(bottom: BorderSide(color: Colors.blueGrey))),
-          child: Text(chapter.title, style: TextStyle(letterSpacing: 1.0, height: 1.2))),
+          child: Text.rich(TextSpan(text: chapter.title,recognizer:TapGestureRecognizer(),), style: TextStyle(letterSpacing: 1.0, height: 1.2))),
     );
   }
 }
 
 /// 章节内容
 class Chapter {
+  /// 章节id
   final int chapterId;
+  /// 小说id
   final int novelId;
+  /// 章节内容
   final String content;
+  /// 章节标题
   final String title;
 
   Chapter(this.chapterId, this.novelId, this.content, this.title);

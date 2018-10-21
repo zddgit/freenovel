@@ -17,15 +17,15 @@ class _BookshelfState extends State<Bookshelf> {
     super.initState();
     //TODO 初始化读过的小说,本地文件读取
     novels = <Novel>[
-      Novel(1, "images/3773s.jpg", "三寸人间", "耳根",
-          "星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之", null),
-      Novel(2, "images/4772s.jpg", "圣墟", "辰东", "在破败中崛起，在寂灭中复苏", null),
+        Novel(1, "三寸人间", "耳根",imageUrl:"images/3773s.jpg",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
+        Novel(2, "圣墟", "辰东",imageUrl:"images/4772s.jpg",introduction:"在破败中崛起，在寂灭中复苏"),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white12,
       appBar: AppBar(backgroundColor: Colors.blue, title: Text("书架"),centerTitle: true,),
       body: ListView.builder(
           itemCount: novels == null ? 0 : novels.length,
@@ -83,43 +83,53 @@ class _BookshelfState extends State<Bookshelf> {
   Widget _itemBuilder(BuildContext context, int index) {
     Novel novel = novels[index];
     return Card(
-      child: ListTile(
-        leading: Image.asset(
-          novel.imageUrl,
-          height: 50.0,
-          width: 50.0,
+      color: Colors.black12,
+      child: Container(
+        padding: EdgeInsets.only(top: 15.0),
+        height: 100.0,
+        child: ListTile(
+          leading: Image.asset(
+            novel.imageUrl,
+            height: 80.0,
+            //width: 50.0,
+          ),
+          title: Text(novel.name),
+          subtitle: Text(novel.author),
+          trailing: Container(
+              width: 150.0,
+              height: 80.0,
+              child: Center(
+                  child: Text(
+                novel.introduction,
+                style: TextStyle(
+                    fontSize: 10.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black45),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ))),
+          onTap: () => _open(novel.id),
+          onLongPress: ()=>_showDialog(index),
         ),
-        title: Text(novel.name),
-        subtitle: Text(novel.author),
-        trailing: Container(
-            width: 150.0,
-            height: 50.0,
-            child: Center(
-                child: Text(
-              novel.introduction,
-              style: TextStyle(
-                  fontSize: 10.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ))),
-        onTap: () => _open(novel.id),
-        onLongPress: ()=>_showDialog(index),
       ),
     );
   }
 }
 
 class Novel {
+  /// 小说id
   final int id;
+  /// 小说封面
   final String imageUrl;
+  /// 小说名称
   final String name;
+  /// 小说作者
   final String author;
+  /// 小说简介
   final String introduction;
+  /// 最近阅读时间
   final DateTime recentReadTime;
 
 
-  Novel(this.id, this.imageUrl, this.name, this.author, this.introduction,
-      this.recentReadTime);
+  Novel(this.id, this.name, this.author,{this.imageUrl,  this.introduction, this.recentReadTime});
 }
