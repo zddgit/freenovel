@@ -33,6 +33,7 @@ class _BookshelfState extends State<Bookshelf> {
     );
   }
 
+  /// 打开章节详情页
   void _open(int chapterIndex) {
     Navigator.of(context).push(new PageRouteBuilder(
         pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
@@ -50,6 +51,7 @@ class _BookshelfState extends State<Bookshelf> {
           );
         }));
   }
+  /// 长按删除
   void _showDialog(int index) {
     showDialog(
       context: context,
@@ -79,7 +81,7 @@ class _BookshelfState extends State<Bookshelf> {
       },
     );
   }
-
+  /// 书架具体元素构建
   Widget _itemBuilder(BuildContext context, int index) {
     Novel novel = novels[index];
     return Card(
@@ -128,8 +130,8 @@ class Novel {
   /// 小说简介
   final String introduction;
   /// 最近阅读时间
-  final DateTime recentReadTime;
+  final int recentUpdateTime;
 
 
-  Novel(this.id, this.name, this.author,{this.imageUrl,  this.introduction, this.recentReadTime});
+  Novel(this.id, this.name, this.author,{this.imageUrl,  this.introduction, this.recentUpdateTime});
 }
