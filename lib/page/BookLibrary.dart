@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freenovel/common/CommonSearchBarDelegate.dart';
-import 'package:freenovel/page/bookshelf.dart';
+import 'package:freenovel/net/NovelAPI.dart';
+import 'package:freenovel/page/Bookshelf.dart';
 
 ///书库
 class BookLibrary extends StatefulWidget {
@@ -26,14 +27,14 @@ class BookLibraryState extends State<BookLibrary> {
                 if(query.isEmpty){
                   //TODO 从网络获取最热小说(带本地缓存)
                   novels = <Novel>[
-                    Novel(1, "a三寸人间", "耳根",imageUrl:"images/3773s.jpg",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
-                    Novel(2, "b圣墟", "辰东",imageUrl:"images/4772s.jpg",introduction:"在破败中崛起，在寂灭中复苏"),
+                    Novel(1, "a三寸人间", "耳根",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
+                    Novel(2, "b圣墟", "辰东",introduction:"在破败中崛起，在寂灭中复苏"),
                   ];
                 }else{
                   //TODO 从网络获取匹配的小说(带本地缓存)
                   novels = <Novel>[
-                    Novel(1, "c三寸人间", "耳根",imageUrl:"images/3773s.jpg",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
-                    Novel(2, "d圣墟", "辰东",imageUrl:"images/4772s.jpg",introduction:"在破败中崛起，在寂灭中复苏"),
+                    Novel(1, "c三寸人间", "耳根",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
+                    Novel(2, "d圣墟", "辰东",introduction:"在破败中崛起，在寂灭中复苏"),
                   ];
                   novels = novels.where((input) => input.name.startsWith(query)).toList();
                 }
@@ -60,7 +61,7 @@ class BookLibraryState extends State<BookLibrary> {
     return Card(
       child: ListTile(
         leading: Image.asset(
-          novel.imageUrl,
+          NovelAPI.getImage(novel.id),
           height: 50.0,
           width: 50.0,
         ),

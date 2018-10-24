@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/page/MySelf.dart';
 import 'package:freenovel/page/Talk.dart';
-import 'package:freenovel/page/bookshelf.dart';
+import 'package:freenovel/page/Bookshelf.dart';
 
 /// 首页
 class Home extends StatefulWidget {
