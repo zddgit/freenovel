@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freenovel/common/CommonSearchBarDelegate.dart';
-import 'package:freenovel/net/NovelAPI.dart';
+import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/page/Bookshelf.dart';
 
 ///书库

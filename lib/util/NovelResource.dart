@@ -10,13 +10,13 @@ class NovelAPI{
   /// 获取小说封面
   static String getImage(int novelId)=>baseURI+"getImage/$novelId.jpg";
 
+}
+class NovelStatus{
+
   //书架列表
-  static String bookshelfData = "bookshelf";
+  static String bookshelfPrefsKey = "bookshelf";
   //阅读状态
-  static String readStatus = "readStatus";
+  static String _readStatus = "readStatus_";
 
-
-
-
-
+  static String getReadStatusPrefsKey(int novelId)=>_readStatus+novelId.toString();
 }

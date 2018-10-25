@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:freenovel/net/NovelAPI.dart';
+import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -25,7 +25,7 @@ class _BookshelfState extends State<Bookshelf> {
 
   initNovels() async {
     prefs = await SharedPreferences.getInstance();
-    String novelsStr = prefs.getString(NovelAPI.bookshelfData);
+    String novelsStr = prefs.getString(NovelStatus.bookshelfPrefsKey);
     if (novelsStr == null) {
       novels = [];
     } else {
@@ -89,7 +89,7 @@ class _BookshelfState extends State<Bookshelf> {
                 Navigator.of(context).pop();
                 setState(() {
                   novels.removeAt(index);
-                  prefs.setString(NovelAPI.bookshelfData, json.encode(novels));
+                  prefs.setString(NovelStatus.bookshelfPrefsKey, json.encode(novels));
                 });
               },
             ),
