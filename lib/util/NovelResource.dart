@@ -13,10 +13,14 @@ class NovelAPI{
 }
 class NovelStatus{
 
-  //书架列表
+  //书架列表（长字符串如1,2） 小说id集合
   static String bookshelfPrefsKey = "bookshelf";
-  //阅读状态
+
+  static String _novelInfo="novelInfo_";
   static String _readStatus = "readStatus_";
 
+  ///单个小说信息(json结构)
   static String getReadStatusPrefsKey(int novelId)=>_readStatus+novelId.toString();
+  ///阅读状态(阅读到第几章int)
+  static String getNovelInfoPrefsKey(int novelId)=>_novelInfo+novelId.toString();
 }

@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 class Bookshelf extends StatefulWidget {
   @override
@@ -22,20 +23,31 @@ class _BookshelfState extends State<Bookshelf> {
     //TODO 初始化读过的小说,本地文件读取
     initNovels();
   }
+  updateUI({fn}) {
+    setState(() {
+      if (fn != null) fn();
+    });
+  }
 
   initNovels() async {
     prefs = await SharedPreferences.getInstance();
+//    prefs.setString(NovelStatus.bookshelfPrefsKey, "1,2");
+//    prefs.setString(NovelStatus.getNovelInfoPrefsKey(1), '{"id":1,"name":"圣墟","author":"辰东","introduction":"在破败中崛起，在寂灭中复苏"}');
+//    prefs.setString(NovelStatus.getNovelInfoPrefsKey(2), '{"id":2,"name":"三寸人间","author":"耳根","introduction":"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"}');
     String novelsStr = prefs.getString(NovelStatus.bookshelfPrefsKey);
     if (novelsStr == null) {
       novels = [];
     } else {
-      List novelList = json.decode(novelsStr);
+      List<String> novelIds = novelsStr.split(",");
       if(novels==null) novels = [];
-      novelList.forEach((item) => novels.add(Novel(item['id'], item['name'], item['author'],introduction: item["introduction"])));
+      novelIds.forEach((item){
+        String key = NovelStatus.getNovelInfoPrefsKey(int.parse(item));
+        Map map = json.decode(prefs.getString(key));
+        novels.add(Novel(map['id'], map['name'], map['author'],introduction: map["introduction"]));
+      });
     }
     //更新
-    setState(() {
-    });
+    updateUI();
   }
 
   @override
@@ -134,7 +146,7 @@ class _BookshelfState extends State<Bookshelf> {
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ))),
-          onTap: () => _open(novel.id,novel.recentChapterId),
+          onTap: () => _open(novel.id,prefs.getInt(NovelStatus.getReadStatusPrefsKey(novel.id))??1),
           onLongPress: () => _showDialog(index),
         ),
       ),

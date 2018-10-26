@@ -35,6 +35,9 @@ class _ChapterDetailState extends State<ChapterDetail> {
 
   SharedPreferences prefs;
 
+  /// 控制是不是点击目录产生的跳转
+  bool onclick=false;
+
 
   _ChapterDetailState(this.novelId, this.currentChapterId);
 
@@ -64,13 +67,11 @@ class _ChapterDetailState extends State<ChapterDetail> {
 
     /// 退出阅读页面的时候保存阅读信息
     String key = NovelStatus.getReadStatusPrefsKey(novelId);
-    Map map = {};
-    map["currentChapterId"] = currentChapterId;
+//    Map map = {};
+//    map["currentChapterId"] = currentChapterId;
+//    prefs.setString(key, json.encode(map));
+    prefs.setInt(key, currentChapterId);
 
-    prefs.setString(key, json.encode(map));
-
-    //print(scrollController.offset);
-    //print(scrollController.position);
   }
 
   void getTitles() async {
@@ -113,6 +114,7 @@ class _ChapterDetailState extends State<ChapterDetail> {
         body: Builder(builder: (BuildContext context) {
           return GestureDetector(
               onVerticalDragDown: (_) {
+                onclick = false;
                 // 当读到最后一章得时候进行加载
                 // 这里指定快划到最后150像素的时候，进行加载
                 if (scrollController.position.maxScrollExtent - scrollController.offset < 150 && currentChapterId < titles.length) {
@@ -132,6 +134,9 @@ class _ChapterDetailState extends State<ChapterDetail> {
               },
               child: RefreshIndicator(
                 onRefresh: () {
+                  if(onclick){
+                    return Future(() { });
+                  }
                   currentChapterId = readChapters.elementAt(0).chapterId;
                   if (currentChapterId >= 2) {
                     currentChapterId--;
@@ -181,9 +186,12 @@ class _ChapterDetailState extends State<ChapterDetail> {
     Chapter chapter = titles[index];
     return GestureDetector(
       onTap: () {
+        onclick = true;
         currentChapterId = index + 1;
         readChapters.clear();
         readChapters.addFirst(chapter);
+        print(readChapters.getLength());
+        scrollController.jumpTo(0.0);
         getNovelDetail(chapter);
         Navigator.of(context).pop();
       },
