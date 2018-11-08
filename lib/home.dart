@@ -3,6 +3,8 @@ import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/page/MySelf.dart';
 import 'package:freenovel/page/Talk.dart';
 import 'package:freenovel/page/Bookshelf.dart';
+import 'package:freenovel/util/SqlfliteHelper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 首页
 class Home extends StatefulWidget {
@@ -13,21 +15,46 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  int _currentIndex = 2;
+  int _currentIndex = 1;
+  SharedPreferences prefs;
+
+  @override
+  initState() {
+    super.initState();
+    initDataBase();
+  }
+  initDataBase() async {
+    prefs = await SharedPreferences.getInstance();
+    String database = prefs.getString("database");
+    if(database==null){
+      String databaseName = "novels";
+      int version = 1;
+      SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+      List<String> ddls = new List();
+      //TODO 数据库设计
+      ddls.add("");
+      await sqfLiteHelper.ddl(databaseName, ddls, version);
+      prefs.setString("database", databaseName);
+    }
+  }
 
   /// 各类页面
   Widget _changBodyWidget() {
     switch (_currentIndex) {
       case 0:
+
         /// 书架
         return Bookshelf();
       case 1:
+
         /// 书库
         return BookLibrary();
       case 2:
+
         /// 动弹
         return Talk();
       case 3:
+
         /// 我的
         return MySelf();
       default:
@@ -41,7 +68,9 @@ class HomeState extends State<Home> {
       home: Scaffold(
         body: _changBodyWidget(),
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(border: BorderDirectional(top: BorderSide(color: Colors.grey[300]))),
+          decoration: BoxDecoration(
+              border:
+                  BorderDirectional(top: BorderSide(color: Colors.grey[300]))),
           child: BottomNavigationBar(
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(

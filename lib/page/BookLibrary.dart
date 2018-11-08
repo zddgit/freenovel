@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:freenovel/common/CommonSearchBarDelegate.dart';
-import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/page/Bookshelf.dart';
+import 'package:freenovel/util/NovelResource.dart';
+import 'package:freenovel/util/SqlfliteHelper.dart';
 
 ///书库
 class BookLibrary extends StatefulWidget {
@@ -47,7 +48,18 @@ class BookLibraryState extends State<BookLibrary> {
         ],
         centerTitle: true,
       ),
-      body: Center(child: Text("书库")),
+      body: Center(child: RaisedButton(
+        color: Colors.blueGrey,
+        onPressed: () async {
+          SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+          List<String> sqls = List();
+          sqls.add("DROP TABLE IF EXISTS `Test`;CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+          sqls.add("CREATE TABLE IF NOT EXISTS `student` (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+          await sqfLiteHelper.delDataBases("novels");
+          //await sqfLiteHelper.ddl("novels", sqls,1);
+
+        },
+        child: Text("书库"),)),
     );
   }
 
