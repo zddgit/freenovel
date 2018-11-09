@@ -173,8 +173,10 @@ class Novel {
   /// 章节id
   final int recentChapterId;
 
+  final String cover;
+
   Novel(this.id, this.name, this.author,
-      {this.introduction, this.recentUpdateTime,this.recentChapterId=1});
+      {this.introduction, this.recentUpdateTime,this.recentChapterId=1,this.cover});
 
   @override
   String toString() {

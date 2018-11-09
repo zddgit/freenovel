@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:freenovel/common/CommonSearchBarDelegate.dart';
 import 'package:freenovel/page/Bookshelf.dart';
+import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 ///书库
 class BookLibrary extends StatefulWidget {
@@ -15,7 +19,58 @@ class BookLibrary extends StatefulWidget {
 class BookLibraryState extends State<BookLibrary> {
   String queryName;
 
-  List<Novel> novels;
+  List<Novel> novels = [];
+  List<Novel> top10Novels = [];
+  List<Novel> showNovels = [];
+  CommonSearchBarDelegate commonSearchBarDelegate;
+
+  @override
+  void initState() {
+    super.initState();
+    queryName = "";
+    commonSearchBarDelegate = new CommonSearchBarDelegate(query);
+    getRecommendNovels();
+  }
+
+  updateUI({fn}) {
+    setState(() {
+      if (fn != null) fn();
+    });
+  }
+
+  getRecommendNovels() async {
+    String top10 = await HttpUtil.get(NovelAPI.getRecommentNovelsTop10());
+    List list = json.decode(top10);
+    list.forEach((item) {
+      top10Novels.add(Novel(item["id"], item["name"], item["author"],
+          introduction: item["introduction"], cover: item["cover"]));
+    });
+  }
+
+  getSearchNovels(String name) async {
+    String searchNovels = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name));
+    List list = json.decode(searchNovels);
+    showNovels = [];
+    list.forEach((item) {
+      showNovels.add(Novel(item["id"], item["name"], item["author"],
+          introduction: item["introduction"], cover: item["cover"]));
+    });
+    updateUI(fn: (){
+      print(showNovels);
+    });
+  }
+
+  Widget query(query){
+    if (query.isEmpty) {
+      showNovels = top10Novels;
+    } else {
+      getSearchNovels(query);
+    }
+    return ListView.builder(
+        itemCount: showNovels.length,
+        itemBuilder: _itemBuilder);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,61 +79,52 @@ class BookLibraryState extends State<BookLibrary> {
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.search),
-              onPressed: () => showSearch(context: context, delegate: CommonSearchBarDelegate((query){
-                if(query.isEmpty){
-                  //TODO 从网络获取最热小说(带本地缓存)
-                  novels = <Novel>[
-                    Novel(1, "a三寸人间", "耳根",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
-                    Novel(2, "b圣墟", "辰东",introduction:"在破败中崛起，在寂灭中复苏"),
-                  ];
-                }else{
-                  //TODO 从网络获取匹配的小说(带本地缓存)
-                  novels = <Novel>[
-                    Novel(1, "c三寸人间", "耳根",introduction:"星空古剑，万族进化，缥缈道院，谁与争锋天下万物，神兵不朽，宇宙苍穹，太虚称尊青木年华，悠悠牧之"),
-                    Novel(2, "d圣墟", "辰东",introduction:"在破败中崛起，在寂灭中复苏"),
-                  ];
-                  novels = novels.where((input) => input.name.startsWith(query)).toList();
-                }
-                return ListView.builder(
-                    itemCount: novels.length,
-                    itemBuilder: _itemBuilder
-                );
-              }))
-          ),
+              onPressed: () => showSearch( context: context, delegate: commonSearchBarDelegate)),
         ],
         centerTitle: true,
       ),
-      body: Center(child: RaisedButton(
-        color: Colors.blueGrey,
-        onPressed: () async {
-          SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-          List<String> sqls = List();
-          sqls.add("DROP TABLE IF EXISTS `Test`;CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
-          sqls.add("CREATE TABLE IF NOT EXISTS `student` (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
-          await sqfLiteHelper.delDataBases("novels");
-          //await sqfLiteHelper.ddl("novels", sqls,1);
-
-        },
-        child: Text("书库"),)),
+      body: Center(
+          child: RaisedButton(
+            color: Colors.blueGrey,
+            onPressed: () async {
+              SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+              List<String> sqls = List();
+              sqls.add(
+                  "DROP TABLE IF EXISTS `Test`;CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+              sqls.add(
+                  "CREATE TABLE IF NOT EXISTS `student` (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)");
+              await sqfLiteHelper.delDataBases("novels");
+              //await sqfLiteHelper.ddl("novels", sqls,1);
+            },
+            child: Text("书库"),
+          )),
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    queryName = "";
-  }
   Widget _itemBuilder(BuildContext context, int index) {
-    Novel novel = novels[index];
+    Novel novel = showNovels[index];
     return Card(
       child: ListTile(
-        leading: Image.asset(
-          NovelAPI.getImage(novel.id),
-          height: 50.0,
+        leading: Container(
           width: 50.0,
+          height: 55.0,
+          decoration: BoxDecoration(
+              border: Border.all(width: 2.0, color: Colors.black38),
+              borderRadius:BorderRadius.all(Radius.circular(2.0))),
+          child: new CachedNetworkImage(
+            imageUrl: NovelAPI.getImage(novel.id),
+            placeholder: new CircularProgressIndicator(),
+            errorWidget: Container(
+                color: Colors.blueGrey,
+                child: Center(child: Text(novel.name.substring(0, 1))),
+            ),
+            width: 50.0,
+            height: 55.0,
+            fit: BoxFit.cover,
+          ),
         ),
         title: Text(novel.name),
-        subtitle: Text(novel.author),
+        subtitle : Text(novel.author),
         trailing: Container(
             width: 150.0,
             height: 50.0,
@@ -90,11 +136,14 @@ class BookLibraryState extends State<BookLibrary> {
                       fontWeight: FontWeight.bold,
                       color: Colors.grey),
                   maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow
+                      .ellipsis,
                 ))),
-        onTap: () {},
-      ),
+//        onTap: () {
+//          print("dianji$index");
+//        } ,
+      )
+      ,
     );
   }
-
 }

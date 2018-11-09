@@ -32,9 +32,11 @@ class HomeState extends State<Home> {
       SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
       List<String> ddls = new List();
       //TODO 数据库设计
-      ddls.add("");
+      ddls.add("CREATE TABLE IF NOT EXISTS `novel` (id INTEGER PRIMARY KEY, name TEXT,author TEXT, introduction TEXT, cover TEXT)");
+      ddls.add("CREATE TABLE IF NOT EXISTS `chapter` (novelId INTEGER,chapterId INTEGER, title TEXT, content TEXT, primary key (novelId,chapterId))");
       await sqfLiteHelper.ddl(databaseName, ddls, version);
       prefs.setString("database", databaseName);
+      print("生成数据库$databaseName");
     }
   }
 

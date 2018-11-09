@@ -9,6 +9,10 @@ class NovelAPI{
   static String getNovel(int novelId)=>baseURI+"getNovel/$novelId";
   /// 获取小说封面
   static String getImage(int novelId)=>baseURI+"getImage/$novelId.jpg";
+  /// 推荐小说列表top10
+  static String getRecommentNovelsTop10()=>baseURI+"getRecommentNovelsTop10";
+  /// 搜索小说通过名字或者作者
+  static String getNovelsByNameOrAuthor(String keyword)=>baseURI+"getNovelsByNameOrAuthor?keyword=$keyword";
 
 }
 class NovelStatus{
