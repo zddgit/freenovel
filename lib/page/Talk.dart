@@ -30,15 +30,7 @@ class TalkState extends State<Talk> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.search),
-              //TODO 等待修改 delegate
-              onPressed: () => showSearch(context: context, delegate: null)),
-        ],
-        title: Text("搜昵称"),
-        bottom: TabBar(
+        title: TabBar(
           indicatorColor: Colors.white,
           tabs: tabs,
           isScrollable: false,

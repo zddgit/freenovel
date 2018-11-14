@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -8,12 +9,11 @@ class SqfLiteHelper {
     var databasesPath = await sqflite.getDatabasesPath();
     String _path = path.join(databasesPath, "$dbName.db");
     if (await new Directory(path.dirname(_path)).exists()) {
-      print("$_path");
       if (isdel) {
-        print("$dbName.db已经存在,删除创建新的");
+        /// db已经存在,删除创建新的
         await sqflite.deleteDatabase(_path);
       } else {
-        print("$dbName.db已经存在");
+        /// db已经存在
       }
     }
     return _path;

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:freenovel/Global.dart';
+import 'package:freenovel/util/SqlfliteHelper.dart';
 
 ///我的
 class MySelf extends StatefulWidget {
@@ -13,7 +15,16 @@ class MySelfState extends State<MySelf> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Text("我的"),
+      body: Center(child: RaisedButton(
+        child: Text("我的"),
+        onPressed: (){
+          DateTime now = new DateTime.now();
+          print(now.millisecondsSinceEpoch~/1000);
+          Global.prefs.remove("database");
+          SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+          sqfLiteHelper.delDataBases("novels");
+        },
+      )),
     );
   }
 }

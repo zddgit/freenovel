@@ -1,32 +1,33 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:freenovel/common/NovelSqlHelper.dart';
+import 'package:freenovel/common/Tools.dart';
+import 'package:freenovel/page/Bookshelf.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/LimitQueue.dart';
 import 'package:freenovel/util/NovelResource.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:freenovel/util/SqlfliteHelper.dart';
 
 /// 文章主体页面
 class ChapterDetail extends StatefulWidget {
   final int novelId;
   final int recentChapterId;
+  BookshelfState bookshelfState;
 
-  ChapterDetail(this.recentChapterId, this.novelId);
+
+  ChapterDetail(this.recentChapterId, this.novelId,this.bookshelfState);
 
   @override
   _ChapterDetailState createState() {
-    return _ChapterDetailState(novelId, recentChapterId);
+    return _ChapterDetailState(novelId, recentChapterId,bookshelfState);
   }
 }
 
 
 
-
-
-
-
 class _ChapterDetailState extends State<ChapterDetail> {
-  SharedPreferences prefs;
   /// 当前所读小说的id和章节id
   final int novelId;
   int currentChapterId;
@@ -39,46 +40,37 @@ class _ChapterDetailState extends State<ChapterDetail> {
   /// 控制是不是点击目录产生的跳转
   bool onclick = false;
 
-  _ChapterDetailState(this.novelId, this.currentChapterId);
+  BookshelfState bookshelfState;
+
+  _ChapterDetailState(this.novelId, this.currentChapterId,this.bookshelfState);
 
   @override
   void initState() {
     super.initState();
     scrollController = ScrollController();
     readChapters = LimitQueue(5);
-    // TODO: 初始化从网络读取章节目录
     getTitles();
-    initPrefs();
   }
 
   @override
   void dispose() {
     super.dispose();
     /// 退出阅读页面的时候保存阅读信息
-    String key = NovelStatus.getReadStatusPrefsKey(novelId);
-    prefs.setInt(key, currentChapterId);
+    bookshelfState.readMap[novelId] = currentChapterId;
+    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+    sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId,[currentChapterId,novelId]);
+
   }
   getTitles() async {
     String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
     List list = json.decode(titlesJsonStr);
     if (titles == null) titles = [];
     list.forEach((item) {
-      titles.add(Chapter(item['chapterId'], item['novelId'],
-          "第${item['chapterId']}章 " + item['title']));
+      titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
     });
-    readChapters.addLast(
-        titles.elementAt(currentChapterId == null ? 0 : currentChapterId - 1));
+    readChapters.addLast( titles.elementAt(currentChapterId == null ? 0 : currentChapterId - 1));
     getNovelDetail(readChapters.elementAt(0));
-    updateUI();
-  }
-  initPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-  }
-
-  updateUI({fn}) {
-    setState(() {
-      if (fn != null) fn();
-    });
+    Tools.updateUI(this);
   }
 
   @override
@@ -148,7 +140,7 @@ class _ChapterDetailState extends State<ChapterDetail> {
     // 当读到最后一章得时候进行加载
     // 这里指定快划到最后150像素的时候，进行加载
     double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
-    if ( threshold< 150 && currentChapterId < titles.length) {
+    if (threshold < 150 && currentChapterId < titles.length) {
       Chapter ch = Chapter( currentChapterId + 1, novelId, titles[currentChapterId].title);
       readChapters.addLast(ch);
       getNovelDetail(ch);
@@ -168,7 +160,7 @@ class _ChapterDetailState extends State<ChapterDetail> {
   Future<void> getNovelDetail(Chapter ch) async {
     String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId));
     ch.content = content;
-    updateUI();
+    Tools.updateUI(this);
   }
 
   /// 章节内容

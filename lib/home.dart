@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:freenovel/Global.dart';
+import 'package:freenovel/common/NovelSqlHelper.dart';
 import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/page/MySelf.dart';
 import 'package:freenovel/page/Talk.dart';
@@ -15,28 +17,24 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  int _currentIndex = 1;
-  SharedPreferences prefs;
+  int _currentIndex = 0;
 
   @override
   initState() {
     super.initState();
-    initDataBase();
+    Global.init(initDataBase);
   }
   initDataBase() async {
-    prefs = await SharedPreferences.getInstance();
-    String database = prefs.getString("database");
+    String database = Global.prefs.getString("database");
     if(database==null){
-      String databaseName = "novels";
       int version = 1;
       SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
       List<String> ddls = new List();
-      //TODO 数据库设计
-      ddls.add("CREATE TABLE IF NOT EXISTS `novel` (id INTEGER PRIMARY KEY, name TEXT,author TEXT, introduction TEXT, cover TEXT)");
-      ddls.add("CREATE TABLE IF NOT EXISTS `chapter` (novelId INTEGER,chapterId INTEGER, title TEXT, content TEXT, primary key (novelId,chapterId))");
-      await sqfLiteHelper.ddl(databaseName, ddls, version);
-      prefs.setString("database", databaseName);
-      print("生成数据库$databaseName");
+      ddls.add(NovelSqlHelper.novelTableDDL);
+      ddls.add(NovelSqlHelper.chapterTableDDL);
+      await sqfLiteHelper.ddl(NovelSqlHelper.databaseName, ddls, version);
+      Global.prefs.setString("database", NovelSqlHelper.databaseName);
+      print("生成数据库${NovelSqlHelper.databaseName}");
     }
   }
 

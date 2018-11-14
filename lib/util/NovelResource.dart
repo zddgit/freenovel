@@ -13,13 +13,16 @@ class NovelAPI{
   static String getRecommentNovelsTop10()=>baseURI+"getRecommentNovelsTop10";
   /// 搜索小说通过名字或者作者
   static String getNovelsByNameOrAuthor(String keyword)=>baseURI+"getNovelsByNameOrAuthor?keyword=$keyword";
+  /// 获取小说所有类别
+  static String getTags()=>baseURI+"getDicByType?type=tag";
+  /// 根据类别获取小说
+  static String getNovelsByTag(int tagId)=>baseURI+"getNovelsByTag?tagId=$tagId";
 
 }
 class NovelStatus{
 
   //书架列表（长字符串如1,2） 小说id集合
   static String bookshelfPrefsKey = "bookshelf";
-
   static String _novelInfo="novelInfo_";
   static String _readStatus = "readStatus_";
 
