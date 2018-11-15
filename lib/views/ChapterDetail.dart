@@ -40,6 +40,8 @@ class _ChapterDetailState extends State<ChapterDetail> {
   /// 控制是不是点击目录产生的跳转
   bool onclick = false;
 
+  bool hide = true;
+
   BookshelfState bookshelfState;
 
   _ChapterDetailState(this.novelId, this.currentChapterId,this.bookshelfState);
@@ -49,6 +51,7 @@ class _ChapterDetailState extends State<ChapterDetail> {
     super.initState();
     scrollController = ScrollController();
     readChapters = LimitQueue(5);
+    getNovel();
     getTitles();
   }
 
@@ -61,6 +64,12 @@ class _ChapterDetailState extends State<ChapterDetail> {
     sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId,[currentChapterId,novelId]);
 
   }
+  getNovel() async {
+//    readChapters.addLast( titles.elementAt(currentChapterId == null ? 0 : currentChapterId - 1));
+    readChapters.addLast(Chapter(currentChapterId, novelId, ""));
+    getNovelDetail(readChapters.elementAt(0));
+    Tools.updateUI(this);
+  }
   getTitles() async {
     String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
     List list = json.decode(titlesJsonStr);
@@ -68,8 +77,6 @@ class _ChapterDetailState extends State<ChapterDetail> {
     list.forEach((item) {
       titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
     });
-    readChapters.addLast( titles.elementAt(currentChapterId == null ? 0 : currentChapterId - 1));
-    getNovelDetail(readChapters.elementAt(0));
     Tools.updateUI(this);
   }
 
@@ -101,14 +108,43 @@ class _ChapterDetailState extends State<ChapterDetail> {
         body: Builder(builder: (BuildContext context) {
           return GestureDetector(
               onVerticalDragDown: onVerticalDragDown,
+              onTap: (){
+                hide = !hide;
+                Tools.updateUI(this);
+              },
               child: RefreshIndicator(
                 onRefresh: onRefresh,
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: readChapters == null ? 0 : readChapters.getLength(),
-                  itemBuilder: _chapterContentitemBuilder,
+                child: Stack(
+                  children: <Widget>[
+                    Container(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: readChapters == null ? 0 : readChapters.getLength(),
+                        itemBuilder: _chapterContentitemBuilder,
+                      ),),
+                    Offstage(
+                      offstage: hide,
+                      child: Container(
+                        color: Colors.black,
+                        width: MediaQuery.of(context).size.width,
+                        height: 60.0,
+                        child: Row(
+                          children: <Widget>[
+                            IconButton(
+                                padding:EdgeInsets.only(top: MediaQuery.of(context).padding.top,left: 8.0),
+                                alignment:Alignment.centerLeft,
+                                icon: Icon(Icons.keyboard_backspace,color: Colors.white,),
+                                onPressed: (){
+                                  Navigator.of(context).pop();
+                                }),
+                          ]
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              ));
+              )
+          );
         }));
   }
 
@@ -159,7 +195,9 @@ class _ChapterDetailState extends State<ChapterDetail> {
   /// 网络获取章节内容
   Future<void> getNovelDetail(Chapter ch) async {
     String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId));
-    ch.content = content;
+    var result = json.decode(content);
+    ch.content = result["content_str"];
+    ch.title = result["title"];
     Tools.updateUI(this);
   }
 
@@ -198,13 +236,6 @@ class _ChapterDetailState extends State<ChapterDetail> {
 }
 
 
-
-
-
-
-
-
-
 /// 章节内容
 class Chapter {
   /// 章节id
@@ -214,7 +245,7 @@ class Chapter {
   final int novelId;
 
   /// 章节标题
-  final String title;
+  String title;
 
   /// 章节内容
   String content;

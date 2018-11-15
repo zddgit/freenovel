@@ -16,7 +16,7 @@ class NovelAPI{
   /// 获取小说所有类别
   static String getTags()=>baseURI+"getDicByType?type=tag";
   /// 根据类别获取小说
-  static String getNovelsByTag(int tagId)=>baseURI+"getNovelsByTag?tagId=$tagId";
+  static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
 
 }
 class NovelStatus{

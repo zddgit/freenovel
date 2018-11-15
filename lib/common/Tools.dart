@@ -4,12 +4,15 @@ import 'package:freenovel/common/NovelSqlHelper.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 
-typedef onTapFn = void Function(int index,List novels,BuildContext context);
-typedef onLongPressFn = void Function(int index,List novels,BuildContext context);
+typedef onTapFn = void Function(int index, List novels, BuildContext context);
+typedef onLongPressFn = void Function(
+    int index, List novels, BuildContext context);
 
 class Tools {
-  static ListView listViewBuilder(var showNovels,{onTapFn onTap,onLongPressFn onLongPress}) {
+  static ListView listViewBuilder(var showNovels,
+      {onTapFn onTap, onLongPressFn onLongPress, ScrollController controller}) {
     return ListView.builder(
+      controller: controller,
       itemCount: showNovels.length,
       itemBuilder: (BuildContext context, int index) {
         var novel = showNovels[index];
@@ -38,25 +41,27 @@ class Tools {
             subtitle: Text(novel["author"]),
             trailing: Container(
                 width: 150.0,
-                height: 50.0,
+                height: 55.0,
                 child: Center(
                     child: Text(
                   novel["introduction"],
                   style: TextStyle(
+//                      letterSpacing: 1.0,
+                      height: 1.2,
                       fontSize: 10.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey),
-                  maxLines: 3,
+                  maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                 ))),
             onTap: () {
               if (onTap != null) {
-                onTap(index,showNovels,context);
+                onTap(index, showNovels, context);
               }
             },
-            onLongPress: (){
-              if(onLongPress!=null){
-                onLongPress(index,showNovels,context);
+            onLongPress: () {
+              if (onLongPress != null) {
+                onLongPress(index, showNovels, context);
               }
             },
           ),
@@ -72,7 +77,7 @@ class Tools {
   }
 
   /// 添加到书架
-  static void addToShelf(int index,List showNovels,BuildContext context){
+  static void addToShelf(int index, List showNovels, BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -89,8 +94,9 @@ class Tools {
                 args.add(showNovels[index]["name"]);
                 args.add(showNovels[index]["author"]);
                 args.add(showNovels[index]["introduction"]);
-                args.add(DateTime.now().millisecondsSinceEpoch~/1000);
-                sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel,args);
+                args.add(DateTime.now().millisecondsSinceEpoch ~/ 1000);
+                sqfLiteHelper.insert(NovelSqlHelper.databaseName,
+                    NovelSqlHelper.saveNovel, args);
                 Navigator.of(context).pop();
               },
             ),
@@ -105,8 +111,7 @@ class Tools {
       },
     );
   }
-  /// 打开详情
-  static void openToDetail(int index,List showNovels,BuildContext context){
 
-  }
+  /// 打开详情
+  static void openToDetail(int index, List showNovels, BuildContext context) {}
 }

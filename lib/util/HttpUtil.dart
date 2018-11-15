@@ -9,11 +9,7 @@ class HttpUtil {
     String result;
     Response response=await dio.get(url,data: data);
     if(response.statusCode == 200) {
-      if(response.data is List){
         result = json.encode(response.data);
-      }else{
-        result = response.data;
-      }
     } else {
       result = "Network Error\nHttp status ${response.statusCode}";
       //result = null;
@@ -25,11 +21,7 @@ class HttpUtil {
     String result;
     Response response=await dio.post(url,data: data);
     if(response.statusCode == 200) {
-      if(response.data is List){
         result = json.encode(response.data);
-      }else{
-        result = response.data;
-      }
     } else {
       result = "Network Error\nHttp status ${response.statusCode}";
     }

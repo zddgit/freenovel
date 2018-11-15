@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/common/CommonSearchBarDelegate.dart';
 import 'package:freenovel/common/Tools.dart';
@@ -97,23 +98,52 @@ class LibraryPage extends StatefulWidget {
 class LibraryPageState extends State<LibraryPage> {
   int _tagid;
   List showNovels = [];
+  int currentPage = 1;
+  bool isload = true;
+
+  /// 滚动控制
+  ScrollController scrollController;
 
   LibraryPageState(this._tagid);
 
   @override
   void initState() {
     super.initState();
-    initShowNovels();
+    scrollController = ScrollController();
+    loadShowNovels(_tagid,currentPage);
   }
 
-  initShowNovels() async {
-      String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(_tagid));
-      showNovels = json.decode(novels);
+  loadShowNovels(int tagid,int page) async {
+      String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(tagid,page));
+      List result  = json.decode(novels);
+      if(result.length<10){
+        isload = false;
+      }
+      showNovels.addAll(result);
       Tools.updateUI(this);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf);
+    return GestureDetector(
+      onVerticalDragDown: onVerticalDragDown,
+      child: Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController),
+    );
+  }
+  onVerticalDragDown(DragDownDetails _) {
+    // 这里指定快划到最后150像素的时候，进行加载
+    double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
+    if (isload && threshold < 100) {
+      currentPage = currentPage+1;
+      loadShowNovels(_tagid,currentPage);
+    } else if(threshold < 10) {
+      Fluttertoast.showToast(
+          msg: "没有更多了",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 2,
+          bgcolor: "#777777",
+          textcolor: '#ffffff');
+    }
   }
 }
