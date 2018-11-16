@@ -84,6 +84,7 @@ class BookshelfState extends State<Bookshelf> {
                 Navigator.of(context).pop();
                 SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
                 sqfLiteHelper.del(NovelSqlHelper.databaseName, NovelSqlHelper.delNovelById,[novels[index]["id"]]);
+                sqfLiteHelper.del(NovelSqlHelper.databaseName, NovelSqlHelper.delChapterByNovelId,[novels[index]["id"]]);
                 this.novels.removeAt(index);
                 Tools.updateUI(this);
               },

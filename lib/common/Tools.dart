@@ -94,7 +94,7 @@ class Tools {
                 args.add(showNovels[index]["name"]);
                 args.add(showNovels[index]["author"]);
                 args.add(showNovels[index]["introduction"]);
-                args.add(DateTime.now().millisecondsSinceEpoch ~/ 1000);
+                args.add(Tools.now());
                 sqfLiteHelper.insert(NovelSqlHelper.databaseName,
                     NovelSqlHelper.saveNovel, args);
                 Navigator.of(context).pop();
@@ -112,6 +112,9 @@ class Tools {
     );
   }
 
+  static int now(){
+    return DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  }
   /// 打开详情
   static void openToDetail(int index, List showNovels, BuildContext context) {}
 }

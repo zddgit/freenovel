@@ -32,7 +32,7 @@ class _ChapterDetailState extends State<ChapterDetail> {
   final int novelId;
   int currentChapterId;
   /// 目录章节标题
-  List<Chapter> titles;
+  List<Chapter> titles=[];
   /// 当前正在读的章节
   LimitQueue<Chapter> readChapters;
   /// 滚动控制
@@ -65,18 +65,34 @@ class _ChapterDetailState extends State<ChapterDetail> {
 
   }
   getNovel() async {
-//    readChapters.addLast( titles.elementAt(currentChapterId == null ? 0 : currentChapterId - 1));
     readChapters.addLast(Chapter(currentChapterId, novelId, ""));
     getNovelDetail(readChapters.elementAt(0));
     Tools.updateUI(this);
   }
   getTitles() async {
-    String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
-    List list = json.decode(titlesJsonStr);
-    if (titles == null) titles = [];
-    list.forEach((item) {
-      titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
-    });
+    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChaptersByNovelId,[novelId]);
+    if(list==null || list.length==0){
+      String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
+      list = json.decode(titlesJsonStr);
+      StringBuffer sb = new StringBuffer();
+      list.forEach((item) {
+          titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
+          sb.write("(");
+          sb.write("${item['novelId']},");
+          sb.write("${item['chapterId']},");
+          sb.write("'${item['title']}'");
+          sb.write("),");
+        });
+      String values = sb.toString();
+      values = values.substring(0,values.length-1);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, "insert into chapter (novelId,chapterId,title) values $values");
+      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId,[Tools.now(),novelId]);
+    }else{
+      list.forEach((item) {
+        titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
+      });
+    }
     Tools.updateUI(this);
   }
 

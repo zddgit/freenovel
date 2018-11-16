@@ -18,8 +18,6 @@ class MySelfState extends State<MySelf> {
       body: Center(child: RaisedButton(
         child: Text("我的"),
         onPressed: (){
-          DateTime now = new DateTime.now();
-          print(now.millisecondsSinceEpoch~/1000);
           Global.prefs.remove("database");
           SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
           sqfLiteHelper.delDataBases("novels");
