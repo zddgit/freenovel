@@ -9,6 +9,7 @@ import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/LimitQueue.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
+import 'package:freenovel/views/TitleDetail.dart';
 
 /// 文章主体页面
 class ChapterDetail extends StatefulWidget {
@@ -20,14 +21,14 @@ class ChapterDetail extends StatefulWidget {
   ChapterDetail(this.recentChapterId, this.novelId,this.bookshelfState);
 
   @override
-  _ChapterDetailState createState() {
-    return _ChapterDetailState(novelId, recentChapterId,bookshelfState);
+  ChapterDetailState createState() {
+    return ChapterDetailState(novelId, recentChapterId,bookshelfState);
   }
 }
 
 
 
-class _ChapterDetailState extends State<ChapterDetail> {
+class ChapterDetailState extends State<ChapterDetail> {
   /// 当前所读小说的id和章节id
   final int novelId;
   int currentChapterId;
@@ -44,15 +45,15 @@ class _ChapterDetailState extends State<ChapterDetail> {
 
   BookshelfState bookshelfState;
 
-  _ChapterDetailState(this.novelId, this.currentChapterId,this.bookshelfState);
+  ChapterDetailState(this.novelId, this.currentChapterId,this.bookshelfState);
 
   @override
   void initState() {
     super.initState();
     scrollController = ScrollController();
     readChapters = LimitQueue(5);
-    getNovel();
     getTitles();
+    getNovel();
   }
 
   @override
@@ -77,13 +78,13 @@ class _ChapterDetailState extends State<ChapterDetail> {
       list = json.decode(titlesJsonStr);
       StringBuffer sb = new StringBuffer();
       list.forEach((item) {
-          titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
-          sb.write("(");
-          sb.write("${item['novelId']},");
-          sb.write("${item['chapterId']},");
-          sb.write("'${item['title']}'");
-          sb.write("),");
-        });
+        titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
+        sb.write("(");
+        sb.write("${item['novelId']},");
+        sb.write("${item['chapterId']},");
+        sb.write("'${item['title']}'");
+        sb.write("),");
+      });
       String values = sb.toString();
       values = values.substring(0,values.length-1);
       sqfLiteHelper.insert(NovelSqlHelper.databaseName, "insert into chapter (novelId,chapterId,title) values $values");
@@ -98,29 +99,12 @@ class _ChapterDetailState extends State<ChapterDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var statusBarHeight = MediaQuery.of(context).padding.top; //状态栏的高度
+//    var statusBarHeight = MediaQuery.of(context).padding.top; //状态栏的高度
 //    var bodyHeight = MediaQuery.of(context).size.height;//屏幕高度
 //    var bodyWidth = MediaQuery.of(context).size.width;//屏幕高度
     return Scaffold(
         backgroundColor: Colors.teal[100],
-        drawer: Container(
-          color: Colors.grey,
-          width: 200.0,
-          child: Container(
-            margin: EdgeInsets.only(top: statusBarHeight, bottom: 10.0),
-            child: Column(
-              children: <Widget>[
-                Text( "目录", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0), ),
-                Expanded(
-                  child: ListView.builder(
-                      padding: EdgeInsets.only(top: 10.0),
-                      itemCount: titles == null ? 0 : titles.length,
-                      itemBuilder: _chapterTitleItemBuilder),
-                )
-              ],
-            ),
-          ),
-        ),
+        drawer: TitleDetail(this),
         body: Builder(builder: (BuildContext context) {
           return GestureDetector(
               onVerticalDragDown: onVerticalDragDown,
@@ -227,28 +211,6 @@ class _ChapterDetailState extends State<ChapterDetail> {
     );
   }
 
-  /// 目录
-  Widget _chapterTitleItemBuilder(BuildContext context, int index) {
-    Chapter chapter = titles[index];
-    return GestureDetector(
-      onTap: () {
-        onclick = true;
-        currentChapterId = index + 1;
-        readChapters.clear();
-        readChapters.addFirst(chapter);
-        scrollController.jumpTo(0.0);
-        getNovelDetail(chapter);
-        Navigator.of(context).pop();
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-            decoration: BoxDecoration( border: Border(bottom: BorderSide(color: Colors.blueGrey))),
-            child: Text(chapter.title,
-                style: TextStyle(letterSpacing: 1.0, height: 1.2))),
-      ),
-    );
-  }
 }
 
 

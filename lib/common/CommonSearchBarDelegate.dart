@@ -21,7 +21,8 @@ class CommonSearchBarDelegate<T> extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Container(
+    return
+      Container(
       width: 100.0,
       height: 100.0,
       child: Card(
