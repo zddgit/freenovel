@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:freenovel/common/NovelSqlHelper.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
+import 'package:freenovel/views/ChapterDetail.dart';
 
 typedef onTapFn = void Function(int index, List novels, BuildContext context);
 typedef onLongPressFn = void Function(
     int index, List novels, BuildContext context);
 
 class Tools {
-  static ListView listViewBuilder(var showNovels,
-      {onTapFn onTap, onLongPressFn onLongPress, ScrollController controller}) {
+  static ListView listViewBuilder(var showNovels, {onTapFn onTap, onLongPressFn onLongPress, ScrollController controller}) {
     return ListView.builder(
       controller: controller,
       itemCount: showNovels.length,
@@ -77,7 +77,10 @@ class Tools {
   }
 
   /// 添加到书架
-  static void addToShelf(int index, List showNovels, BuildContext context) {
+  static void addToShelf(int index, List showNovels, BuildContext context,{var novel}) {
+    if(novel==null){
+      novel = showNovels[index];
+    }
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -90,13 +93,12 @@ class Tools {
               onPressed: () {
                 SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
                 List args = [];
-                args.add(showNovels[index]["id"]);
-                args.add(showNovels[index]["name"]);
-                args.add(showNovels[index]["author"]);
-                args.add(showNovels[index]["introduction"]);
+                args.add(novel["id"]);
+                args.add(novel["name"]);
+                args.add(novel["author"]);
+                args.add(novel["introduction"]);
                 args.add(Tools.now());
-                sqfLiteHelper.insert(NovelSqlHelper.databaseName,
-                    NovelSqlHelper.saveNovel, args);
+                sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
                 Navigator.of(context).pop();
               },
             ),
@@ -110,6 +112,26 @@ class Tools {
         );
       },
     );
+  }
+
+  /// 打开章节详情页
+  static void openChapterDetail(int index,List novels,BuildContext context) {
+    var novel = novels[index];
+    Navigator.of(context).push(
+        new PageRouteBuilder(
+            pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) { return new ChapterDetail(novel);},
+            transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+              return new FadeTransition(
+                opacity: animation,
+                child: new SlideTransition(
+                  position: new Tween<Offset>(
+                    begin: Offset(1.0, 0.0),
+                    end: Offset(0.0, 0.0),
+                  ).animate(animation),
+                  child: child,
+                ),
+              );
+            }));
   }
 
   static int now(){

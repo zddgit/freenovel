@@ -63,6 +63,7 @@ class SqfLiteHelper {
   }
   void dataBaseClose(){
     db.close();
+    db = null;
   }
 
   ddl(String dbName, List<String> sqls, int version) async {

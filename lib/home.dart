@@ -68,9 +68,7 @@ class HomeState extends State<Home> {
       home: Scaffold(
         body: _changBodyWidget(),
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-              border:
-                  BorderDirectional(top: BorderSide(color: Colors.grey[300]))),
+          decoration: BoxDecoration( border: BorderDirectional(top: BorderSide(color: Colors.grey[300]))),
           child: BottomNavigationBar(
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(

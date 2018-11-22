@@ -1,4 +1,5 @@
 class NovelAPI{
+//  static final String baseURI = "http://47.105.67.114:8080/";
   static final String baseURI = "Http://192.168.1.194:8080/";
 
   /// 获取小说目录
@@ -12,7 +13,7 @@ class NovelAPI{
   /// 推荐小说列表top10
   static String getRecommentNovelsTop10()=>baseURI+"getRecommentNovelsTop10";
   /// 搜索小说通过名字或者作者
-  static String getNovelsByNameOrAuthor(String keyword)=>baseURI+"getNovelsByNameOrAuthor?keyword=$keyword";
+  static String getNovelsByNameOrAuthor(String keyword,int page)=>baseURI+"getNovelsByNameOrAuthor?keyword=$keyword&page=$page";
   /// 获取小说所有类别
   static String getTags()=>baseURI+"getDicByType?type=tag";
   /// 根据类别获取小说

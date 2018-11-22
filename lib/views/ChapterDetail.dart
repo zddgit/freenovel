@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:freenovel/Global.dart';
 import 'package:freenovel/common/NovelSqlHelper.dart';
 import 'package:freenovel/common/Tools.dart';
 import 'package:freenovel/page/Bookshelf.dart';
@@ -13,43 +14,48 @@ import 'package:freenovel/views/TitleDetail.dart';
 
 /// 文章主体页面
 class ChapterDetail extends StatefulWidget {
-  final int novelId;
-  final int recentChapterId;
-  BookshelfState bookshelfState;
+
+  final Map novel;
 
 
-  ChapterDetail(this.recentChapterId, this.novelId,this.bookshelfState);
+  ChapterDetail(this.novel);
+
 
   @override
   ChapterDetailState createState() {
-    return ChapterDetailState(novelId, recentChapterId,bookshelfState);
+    return ChapterDetailState(novel);
   }
 }
 
-
-
 class ChapterDetailState extends State<ChapterDetail> {
   /// 当前所读小说的id和章节id
-  final int novelId;
+  int novelId;
   int currentChapterId;
+
+  final Map novel;
+
   /// 目录章节标题
-  List<Chapter> titles=[];
+  List<Chapter> titles = [];
+
   /// 当前正在读的章节
   LimitQueue<Chapter> readChapters;
+
   /// 滚动控制
   ScrollController scrollController;
+
   /// 控制是不是点击目录产生的跳转
   bool onclick = false;
 
   bool hide = true;
 
-  BookshelfState bookshelfState;
 
-  ChapterDetailState(this.novelId, this.currentChapterId,this.bookshelfState);
+  ChapterDetailState(this.novel);
 
   @override
   void initState() {
     super.initState();
+    novelId = novel["id"];
+    currentChapterId = novel["readChapterId"];
     scrollController = ScrollController();
     readChapters = LimitQueue(5);
     getTitles();
@@ -58,22 +64,33 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   @override
   void dispose() {
-    super.dispose();
     /// 退出阅读页面的时候保存阅读信息
-    bookshelfState.readMap[novelId] = currentChapterId;
-    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId,[currentChapterId,novelId]);
+    Global.shelfNovels.forEach((item) {
+      if (item["id"] == novelId) {
+        item["readChapterId"] = currentChapterId;
+      }
+    });
 
+
+    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+    sqfLiteHelper.update(
+        NovelSqlHelper.databaseName,
+        NovelSqlHelper.updateReadChapterIdByNovelId,
+        [currentChapterId, novelId]);
+    super.dispose();
   }
+
   getNovel() async {
     readChapters.addLast(Chapter(currentChapterId, novelId, ""));
     getNovelDetail(readChapters.elementAt(0));
     Tools.updateUI(this);
   }
+
   getTitles() async {
     SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChaptersByNovelId,[novelId]);
-    if(list==null || list.length==0){
+    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName,
+        NovelSqlHelper.queryChaptersByNovelId, [novelId]);
+    if (list == null || list.length == 0) {
       String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
       list = json.decode(titlesJsonStr);
       StringBuffer sb = new StringBuffer();
@@ -86,10 +103,12 @@ class ChapterDetailState extends State<ChapterDetail> {
         sb.write("),");
       });
       String values = sb.toString();
-      values = values.substring(0,values.length-1);
-      sqfLiteHelper.insert(NovelSqlHelper.databaseName, "insert into chapter (novelId,chapterId,title) values $values");
-      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId,[Tools.now(),novelId]);
-    }else{
+      values = values.substring(0, values.length - 1);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName,
+          "insert into chapter (novelId,chapterId,title) values $values");
+      sqfLiteHelper.update(NovelSqlHelper.databaseName,
+          NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+    } else {
       list.forEach((item) {
         titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
       });
@@ -108,7 +127,7 @@ class ChapterDetailState extends State<ChapterDetail> {
         body: Builder(builder: (BuildContext context) {
           return GestureDetector(
               onVerticalDragDown: onVerticalDragDown,
-              onTap: (){
+              onTap: () {
                 hide = !hide;
                 Tools.updateUI(this);
               },
@@ -119,32 +138,36 @@ class ChapterDetailState extends State<ChapterDetail> {
                     Container(
                       child: ListView.builder(
                         controller: scrollController,
-                        itemCount: readChapters == null ? 0 : readChapters.getLength(),
+                        itemCount:
+                            readChapters == null ? 0 : readChapters.getLength(),
                         itemBuilder: _chapterContentitemBuilder,
-                      ),),
+                      ),
+                    ),
                     Offstage(
                       offstage: hide,
                       child: Container(
                         color: Colors.black,
                         width: MediaQuery.of(context).size.width,
                         height: 60.0,
-                        child: Row(
-                          children: <Widget>[
-                            IconButton(
-                                padding:EdgeInsets.only(top: MediaQuery.of(context).padding.top,left: 8.0),
-                                alignment:Alignment.centerLeft,
-                                icon: Icon(Icons.keyboard_backspace,color: Colors.white,),
-                                onPressed: (){
-                                  Navigator.of(context).pop();
-                                }),
-                          ]
-                        ),
+                        child: Row(children: <Widget>[
+                          IconButton(
+                              padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).padding.top,
+                                  left: 8.0),
+                              alignment: Alignment.centerLeft,
+                              icon: Icon(
+                                Icons.keyboard_backspace,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              }),
+                        ]),
                       ),
                     )
                   ],
                 ),
-              )
-          );
+              ));
         }));
   }
 
@@ -155,7 +178,8 @@ class ChapterDetailState extends State<ChapterDetail> {
     currentChapterId = readChapters.elementAt(0).chapterId;
     if (currentChapterId >= 2) {
       currentChapterId--;
-      Chapter ch = Chapter( currentChapterId, novelId, titles[currentChapterId - 1].title);
+      Chapter ch = Chapter(
+          currentChapterId, novelId, titles[currentChapterId - 1].title);
       readChapters.addFirst(ch);
       return getNovelDetail(ch);
     } else {
@@ -175,9 +199,11 @@ class ChapterDetailState extends State<ChapterDetail> {
     onclick = false;
     // 当读到最后一章得时候进行加载
     // 这里指定快划到最后150像素的时候，进行加载
-    double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
+    double threshold =
+        scrollController.position.maxScrollExtent - scrollController.offset;
     if (threshold < 150 && currentChapterId < titles.length) {
-      Chapter ch = Chapter( currentChapterId + 1, novelId, titles[currentChapterId].title);
+      Chapter ch = Chapter(
+          currentChapterId + 1, novelId, titles[currentChapterId].title);
       readChapters.addLast(ch);
       getNovelDetail(ch);
       currentChapterId++;
@@ -194,7 +220,8 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 网络获取章节内容
   Future<void> getNovelDetail(Chapter ch) async {
-    String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId));
+    String content = await HttpUtil.get(
+        NovelAPI.getNovelDetail(ch.novelId, ch.chapterId ?? 1));
     var result = json.decode(content);
     ch.content = result["content_str"];
     ch.title = result["title"];
@@ -210,9 +237,7 @@ class ChapterDetailState extends State<ChapterDetail> {
           style: TextStyle(letterSpacing: 1.0, height: 1.2)),
     );
   }
-
 }
-
 
 /// 章节内容
 class Chapter {

@@ -24,11 +24,15 @@ class BookLibraryState extends State<BookLibrary>
   List<Widget> pages = Global.pages;
   TabController _controller;
   CommonSearchBarDelegate commonSearchBarDelegate;
+  /// 滚动控制
+  ScrollController scrollController;
+  bool isload = true;
 
   @override
   void initState() {
     super.initState();
     queryName = "";
+    scrollController = ScrollController();
     commonSearchBarDelegate = new CommonSearchBarDelegate(query);
     _controller = TabController(length: tabs.length, vsync: this);
     getRecommendNovels();
@@ -42,9 +46,12 @@ class BookLibraryState extends State<BookLibrary>
 
   }
 
-  getSearchNovels(String name) async {
-    String searchNovels = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name));
+  getSearchNovels(String name,{page=1}) async {
+    String searchNovels = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name,page));
     showNovels = json.decode(searchNovels);
+    if(showNovels.length<10){
+      isload = false;
+    }
     Tools.updateUI(this);
   }
 
@@ -52,8 +59,28 @@ class BookLibraryState extends State<BookLibrary>
     if (!query.isEmpty) {
       getSearchNovels(query);
     }
-    return Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf);
+    onVerticalDragDown(DragDownDetails _) {
+      // 这里指定快划到最后150像素的时候，进行加载
+      double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
+      if (isload && threshold < 100) {
+        getSearchNovels(query);
+      } else if(threshold < 10) {
+        Fluttertoast.showToast(
+            msg: "没有更多了",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIos: 2,
+            bgcolor: "#777777",
+            textcolor: '#ffffff');
+      }
+    }
+    return GestureDetector(
+      onVerticalDragDown: onVerticalDragDown,
+      child: Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController)
+//      Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +90,7 @@ class BookLibraryState extends State<BookLibrary>
           actions: <Widget>[
             IconButton(
                 icon: Icon(Icons.search),
-                onPressed: () => showSearch(
-                    context: context, delegate: commonSearchBarDelegate)),
+                onPressed: () => showSearch(context: context, delegate: commonSearchBarDelegate)),
           ],
           centerTitle: true,
           bottom: TabBar(
@@ -97,7 +123,6 @@ class LibraryPage extends StatefulWidget {
 
 class LibraryPageState extends State<LibraryPage> {
   int _tagid;
-  List showNovels = [];
   int currentPage = 1;
   bool isload = true;
 
@@ -110,7 +135,15 @@ class LibraryPageState extends State<LibraryPage> {
   void initState() {
     super.initState();
     scrollController = ScrollController();
-    loadShowNovels(_tagid,currentPage);
+    if(Global.currentPages[_tagid]==1 && Global.map[_tagid].length==0){
+      loadShowNovels(_tagid,currentPage);
+    }
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   loadShowNovels(int tagid,int page) async {
@@ -119,7 +152,8 @@ class LibraryPageState extends State<LibraryPage> {
       if(result.length<10){
         isload = false;
       }
-      showNovels.addAll(result);
+      Global.map[_tagid].addAll(result);
+      Global.currentPages[_tagid] = page;
       Tools.updateUI(this);
   }
 
@@ -127,7 +161,7 @@ class LibraryPageState extends State<LibraryPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onVerticalDragDown: onVerticalDragDown,
-      child: Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController),
+      child: Tools.listViewBuilder(Global.map[_tagid],onLongPress:Tools.addToShelf,controller: scrollController,onTap: Tools.openChapterDetail),
     );
   }
   onVerticalDragDown(DragDownDetails _) {
