@@ -44,7 +44,10 @@ class ChapterDetailState extends State<ChapterDetail> {
   ScrollController scrollController;
 
   /// 控制是不是点击目录产生的跳转
-  bool onclick = false;
+//  bool onclick = false;
+
+  /// 控制是否加载章节数据
+  bool isLoad = true;
 
   bool hide = true;
 
@@ -57,6 +60,9 @@ class ChapterDetailState extends State<ChapterDetail> {
     novelId = novel["id"];
     currentChapterId = novel["readChapterId"];
     scrollController = ScrollController();
+    scrollController.addListener((){
+      loadNextChapter();
+    });
     readChapters = LimitQueue(5);
     getTitles();
     getNovel();
@@ -70,8 +76,6 @@ class ChapterDetailState extends State<ChapterDetail> {
         item["readChapterId"] = currentChapterId;
       }
     });
-
-
     SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
     sqfLiteHelper.update(
         NovelSqlHelper.databaseName,
@@ -80,10 +84,10 @@ class ChapterDetailState extends State<ChapterDetail> {
     super.dispose();
   }
 
+
   getNovel() async {
     readChapters.addLast(Chapter(currentChapterId, novelId, ""));
     getNovelDetail(readChapters.elementAt(0));
-    Tools.updateUI(this);
   }
 
   getTitles() async {
@@ -113,11 +117,13 @@ class ChapterDetailState extends State<ChapterDetail> {
         titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
       });
     }
-    Tools.updateUI(this);
+//    Tools.updateUI(this);
   }
+
 
   @override
   Widget build(BuildContext context) {
+    print("bulid");
 //    var statusBarHeight = MediaQuery.of(context).padding.top; //状态栏的高度
 //    var bodyHeight = MediaQuery.of(context).size.height;//屏幕高度
 //    var bodyWidth = MediaQuery.of(context).size.width;//屏幕高度
@@ -126,7 +132,7 @@ class ChapterDetailState extends State<ChapterDetail> {
         drawer: TitleDetail(this),
         body: Builder(builder: (BuildContext context) {
           return GestureDetector(
-              onVerticalDragDown: onVerticalDragDown,
+//              onVerticalDragDown: onVerticalDragDown,
               onTap: () {
                 hide = !hide;
                 Tools.updateUI(this);
@@ -138,8 +144,7 @@ class ChapterDetailState extends State<ChapterDetail> {
                     Container(
                       child: ListView.builder(
                         controller: scrollController,
-                        itemCount:
-                            readChapters == null ? 0 : readChapters.getLength(),
+                        itemCount: readChapters == null ? 0 : readChapters.getLength(),
                         itemBuilder: _chapterContentitemBuilder,
                       ),
                     ),
@@ -151,15 +156,15 @@ class ChapterDetailState extends State<ChapterDetail> {
                         height: 60.0,
                         child: Row(children: <Widget>[
                           IconButton(
-                              padding: EdgeInsets.only(
-                                  top: MediaQuery.of(context).padding.top,
-                                  left: 8.0),
+                              padding: EdgeInsets.only( top: MediaQuery.of(context).padding.top, left: 8.0),
                               alignment: Alignment.centerLeft,
                               icon: Icon(
                                 Icons.keyboard_backspace,
                                 color: Colors.white,
                               ),
                               onPressed: () {
+                                print(scrollController.position.maxScrollExtent);
+                                print(scrollController.offset);
                                 Navigator.of(context).pop();
                               }),
                         ]),
@@ -172,9 +177,9 @@ class ChapterDetailState extends State<ChapterDetail> {
   }
 
   Future<void> onRefresh() {
-    if (onclick) {
-      return Future(() {});
-    }
+//    if (onclick) {
+//      return Future(() {});
+//    }
     currentChapterId = readChapters.elementAt(0).chapterId;
     if (currentChapterId >= 2) {
       currentChapterId--;
@@ -195,19 +200,21 @@ class ChapterDetailState extends State<ChapterDetail> {
     }
   }
 
-  onVerticalDragDown(DragDownDetails _) {
-    onclick = false;
+  loadNextChapter() {
+//    onclick = false;
     // 当读到最后一章得时候进行加载
     // 这里指定快划到最后150像素的时候，进行加载
-    double threshold =
-        scrollController.position.maxScrollExtent - scrollController.offset;
-    if (threshold < 150 && currentChapterId < titles.length) {
-      Chapter ch = Chapter(
-          currentChapterId + 1, novelId, titles[currentChapterId].title);
+//    print(scrollController.position.maxScrollExtent);
+//    print(scrollController.offset);
+    double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
+    if (threshold < 100 && currentChapterId < titles.length && isLoad) {
+      isLoad = false;
+      Chapter ch = Chapter( currentChapterId + 1, novelId, titles[currentChapterId].title);
       readChapters.addLast(ch);
       getNovelDetail(ch);
       currentChapterId++;
-    } else if (currentChapterId == titles.length && threshold < 50) {
+    } else if (currentChapterId == titles.length && threshold < 50 && isLoad) {
+      isLoad = false;
       Fluttertoast.showToast(
           msg: "已经最后一章了",
           toastLength: Toast.LENGTH_SHORT,
@@ -216,15 +223,16 @@ class ChapterDetailState extends State<ChapterDetail> {
           bgcolor: "#777777",
           textcolor: '#ffffff');
     }
+
   }
 
   /// 网络获取章节内容
   Future<void> getNovelDetail(Chapter ch) async {
-    String content = await HttpUtil.get(
-        NovelAPI.getNovelDetail(ch.novelId, ch.chapterId ?? 1));
+    String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId ?? 1));
     var result = json.decode(content);
     ch.content = result["content_str"];
     ch.title = result["title"];
+    isLoad = true;
     Tools.updateUI(this);
   }
 
@@ -232,10 +240,11 @@ class ChapterDetailState extends State<ChapterDetail> {
   Widget _chapterContentitemBuilder(BuildContext context, int index) {
     Chapter chapter = readChapters.elementAt(index);
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(chapter.title + "\n    " + chapter.content,
-          style: TextStyle(letterSpacing: 1.0, height: 1.2)),
-    );
+    padding: const EdgeInsets.all(8.0),
+    child: Text(chapter.title + "\n    " + chapter.content,
+        style: TextStyle(letterSpacing: 1.0, height: 1.2)),
+    )
+    ;
   }
 }
 
