@@ -23,11 +23,11 @@ class Tools {
               width: 50.0,
               height: 55.0,
               decoration: BoxDecoration(
-                  border: Border.all(width: 2.0, color: Colors.black38),
+                  border: Border.all(width: 1.0, color: Colors.black38),
                   borderRadius: BorderRadius.all(Radius.circular(2.0))),
               child: new CachedNetworkImage(
                 imageUrl: NovelAPI.getImage(novel["id"]),
-                placeholder: new CircularProgressIndicator(),
+//                placeholder: new CircularProgressIndicator(),
                 errorWidget: Container(
                   color: Colors.blueGrey,
                   child: Center(child: Text(novel["name"].substring(0, 1))),
@@ -51,7 +51,7 @@ class Tools {
                       fontSize: 10.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey),
-                  maxLines: 4,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ))),
             onTap: () {

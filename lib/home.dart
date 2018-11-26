@@ -19,24 +19,6 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   int _currentIndex = 0;
 
-  @override
-  initState() {
-    super.initState();
-    Global.init(initDataBase);
-  }
-  initDataBase() async {
-    String database = Global.prefs.getString("database");
-    if(database==null){
-      int version = 1;
-      SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-      List<String> ddls = new List();
-      ddls.add(NovelSqlHelper.novelTableDDL);
-      ddls.add(NovelSqlHelper.chapterTableDDL);
-      await sqfLiteHelper.ddl(NovelSqlHelper.databaseName, ddls, version);
-      Global.prefs.setString("database", NovelSqlHelper.databaseName);
-      print("生成数据库${NovelSqlHelper.databaseName}");
-    }
-  }
 
   /// 各类页面
   Widget _changBodyWidget() {

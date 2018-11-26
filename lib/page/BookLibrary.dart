@@ -20,10 +20,10 @@ class BookLibraryState extends State<BookLibrary>
     with SingleTickerProviderStateMixin {
   String queryName;
   List showNovels = [];
-  List<Tab> tabs = Global.tabs;
-  List<Widget> pages = Global.pages;
+//  List<Tab> tabs = Global.tabs;
+//  List<Widget> pages = Global.pages;
   TabController _controller;
-  CommonSearchBarDelegate commonSearchBarDelegate;
+//  CommonSearchBarDelegate commonSearchBarDelegate;
   /// 滚动控制
   ScrollController scrollController;
   bool isload = true;
@@ -33,18 +33,18 @@ class BookLibraryState extends State<BookLibrary>
     super.initState();
     queryName = "";
     scrollController = ScrollController();
-    commonSearchBarDelegate = new CommonSearchBarDelegate(query);
-    _controller = TabController(length: tabs.length, vsync: this);
-    getRecommendNovels();
+//    commonSearchBarDelegate = new CommonSearchBarDelegate(query);
+    _controller = TabController(length: Global.tabs.length, vsync: this);
+//    getRecommendNovels();
   }
 
 
 
-  getRecommendNovels() async {
-    String top10 = await HttpUtil.get(NovelAPI.getRecommentNovelsTop10());
-    showNovels = json.decode(top10);
-
-  }
+//  getRecommendNovels() async {
+//    String top10 = await HttpUtil.get(NovelAPI.getRecommentNovelsTop10());
+//    showNovels = json.decode(top10);
+//
+//  }
 
   getSearchNovels(String name,{page=1}) async {
     String searchNovels = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name,page));
@@ -55,54 +55,56 @@ class BookLibraryState extends State<BookLibrary>
     Tools.updateUI(this);
   }
 
-  Widget query(query) {
-    if (!query.isEmpty) {
-      getSearchNovels(query);
-    }
-    onVerticalDragDown(DragDownDetails _) {
-      // 这里指定快划到最后150像素的时候，进行加载
-      double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
-      if (isload && threshold < 100) {
-        getSearchNovels(query);
-      } else if(threshold < 10) {
-        Fluttertoast.showToast(
-            msg: "没有更多了",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIos: 2,
-            bgcolor: "#777777",
-            textcolor: '#ffffff');
-      }
-    }
-    return GestureDetector(
-      onVerticalDragDown: onVerticalDragDown,
-      child: Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController)
-//      Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController),
-    );
-  }
+//  Widget query(query) {
+//    if (!query.isEmpty) {
+//      getSearchNovels(query);
+//    }
+//    onVerticalDragDown(DragDownDetails _) {
+//      // 这里指定快划到最后150像素的时候，进行加载
+//      double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
+//      if (isload && threshold < 100) {
+//        getSearchNovels(query);
+//      } else if(threshold < 10) {
+//        Fluttertoast.showToast(
+//            msg: "没有更多了",
+//            toastLength: Toast.LENGTH_SHORT,
+//            gravity: ToastGravity.BOTTOM,
+//            timeInSecForIos: 2,
+//            bgcolor: "#777777",
+//            textcolor: '#ffffff');
+//      }
+//    }
+//    return GestureDetector(
+//      onVerticalDragDown: onVerticalDragDown,
+//      child: Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController)
+////      Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController),
+//    );
+//  }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: new FloatingActionButton(
+            onPressed: () {
+
+            },
+            child: new Icon(Icons.search),
+          ),
         appBar: AppBar(
-          title: Text('搜书名'),
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () => showSearch(context: context, delegate: commonSearchBarDelegate)),
-          ],
-          centerTitle: true,
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            tabs: tabs,
-            isScrollable: true,
-            controller: _controller,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: TabBar(
+              indicatorColor: Colors.white,
+              tabs: Global.tabs,
+              isScrollable: true,
+              controller: _controller,
+            ),
           ),
         ),
         body: TabBarView(
           controller: _controller,
-          children: pages,
+          children: Global.pages,
         )
     );
   }
@@ -135,15 +137,12 @@ class LibraryPageState extends State<LibraryPage> {
   void initState() {
     super.initState();
     scrollController = ScrollController();
+    scrollController.addListener((){
+      print("滑动监听");
+    });
     if(Global.currentPages[_tagid]==1 && Global.map[_tagid].length==0){
       loadShowNovels(_tagid,currentPage);
     }
-  }
-
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   loadShowNovels(int tagid,int page) async {

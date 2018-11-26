@@ -16,10 +16,7 @@ import 'package:freenovel/views/TitleDetail.dart';
 class ChapterDetail extends StatefulWidget {
 
   final Map novel;
-
-
   ChapterDetail(this.novel);
-
 
   @override
   ChapterDetailState createState() {
@@ -31,23 +28,15 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// 当前所读小说的id和章节id
   int novelId;
   int currentChapterId;
-
   final Map novel;
-
   /// 目录章节标题
   List<Chapter> titles = [];
 
+
   /// 当前正在读的章节
   LimitQueue<Chapter> readChapters;
-
   /// 滚动控制
   ScrollController scrollController;
-
-  /// 控制是不是点击目录产生的跳转
-//  bool onclick = false;
-
-  /// 控制是否加载章节数据
-  bool isLoad = true;
 
   bool hide = true;
 
@@ -56,17 +45,15 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   @override
   void initState() {
+    print("init");
     super.initState();
     novelId = novel["id"];
     currentChapterId = novel["readChapterId"];
     scrollController = ScrollController();
-    scrollController.addListener((){
-      loadNextChapter();
-    });
     readChapters = LimitQueue(5);
-    getTitles();
     getNovel();
   }
+
 
   @override
   void dispose() {
@@ -86,14 +73,15 @@ class ChapterDetailState extends State<ChapterDetail> {
 
 
   getNovel() async {
+    await getTitles();
+    currentChapterId = currentChapterId??titles[0].chapterId;
     readChapters.addLast(Chapter(currentChapterId, novelId, ""));
     getNovelDetail(readChapters.elementAt(0));
   }
 
   getTitles() async {
     SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName,
-        NovelSqlHelper.queryChaptersByNovelId, [novelId]);
+    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChaptersByNovelId, [novelId]);
     if (list == null || list.length == 0) {
       String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
       list = json.decode(titlesJsonStr);
@@ -108,38 +96,25 @@ class ChapterDetailState extends State<ChapterDetail> {
       });
       String values = sb.toString();
       values = values.substring(0, values.length - 1);
-      sqfLiteHelper.insert(NovelSqlHelper.databaseName,
-          "insert into chapter (novelId,chapterId,title) values $values");
-      sqfLiteHelper.update(NovelSqlHelper.databaseName,
-          NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, "insert into chapter (novelId,chapterId,title) values $values");
+      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
     } else {
       list.forEach((item) {
         titles.add(Chapter(item['chapterId'], item['novelId'], item['title']));
       });
     }
-//    Tools.updateUI(this);
   }
 
 
   @override
   Widget build(BuildContext context) {
-    print("bulid");
-//    var statusBarHeight = MediaQuery.of(context).padding.top; //状态栏的高度
-//    var bodyHeight = MediaQuery.of(context).size.height;//屏幕高度
-//    var bodyWidth = MediaQuery.of(context).size.width;//屏幕高度
     return Scaffold(
         backgroundColor: Colors.teal[100],
         drawer: TitleDetail(this),
         body: Builder(builder: (BuildContext context) {
-          return GestureDetector(
-//              onVerticalDragDown: onVerticalDragDown,
-              onTap: () {
-                hide = !hide;
-                Tools.updateUI(this);
-              },
-              child: RefreshIndicator(
-                onRefresh: onRefresh,
-                child: Stack(
+          return RefreshIndicator(
+                 onRefresh: onRefresh,
+                 child: Stack(
                   children: <Widget>[
                     Container(
                       child: ListView.builder(
@@ -172,19 +147,15 @@ class ChapterDetailState extends State<ChapterDetail> {
                     )
                   ],
                 ),
-              ));
+              );
         }));
   }
 
   Future<void> onRefresh() {
-//    if (onclick) {
-//      return Future(() {});
-//    }
     currentChapterId = readChapters.elementAt(0).chapterId;
-    if (currentChapterId >= 2) {
+    if (currentChapterId != titles[0].chapterId) {
       currentChapterId--;
-      Chapter ch = Chapter(
-          currentChapterId, novelId, titles[currentChapterId - 1].title);
+      Chapter ch = Chapter(currentChapterId, novelId, titles[currentChapterId - 1].title);
       readChapters.addFirst(ch);
       return getNovelDetail(ch);
     } else {
@@ -201,20 +172,14 @@ class ChapterDetailState extends State<ChapterDetail> {
   }
 
   loadNextChapter() {
-//    onclick = false;
     // 当读到最后一章得时候进行加载
     // 这里指定快划到最后150像素的时候，进行加载
-//    print(scrollController.position.maxScrollExtent);
-//    print(scrollController.offset);
     double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
-    if (threshold < 100 && currentChapterId < titles.length && isLoad) {
-      isLoad = false;
+    if (threshold < 100 && currentChapterId < titles.length ) {
       Chapter ch = Chapter( currentChapterId + 1, novelId, titles[currentChapterId].title);
       readChapters.addLast(ch);
       getNovelDetail(ch);
-      currentChapterId++;
-    } else if (currentChapterId == titles.length && threshold < 50 && isLoad) {
-      isLoad = false;
+    } else if (currentChapterId == titles.length && threshold < 50) {
       Fluttertoast.showToast(
           msg: "已经最后一章了",
           toastLength: Toast.LENGTH_SHORT,
@@ -223,7 +188,6 @@ class ChapterDetailState extends State<ChapterDetail> {
           bgcolor: "#777777",
           textcolor: '#ffffff');
     }
-
   }
 
   /// 网络获取章节内容
@@ -232,19 +196,33 @@ class ChapterDetailState extends State<ChapterDetail> {
     var result = json.decode(content);
     ch.content = result["content_str"];
     ch.title = result["title"];
-    isLoad = true;
     Tools.updateUI(this);
   }
 
   /// 章节内容
   Widget _chapterContentitemBuilder(BuildContext context, int index) {
     Chapter chapter = readChapters.elementAt(index);
-    return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Text(chapter.title + "\n    " + chapter.content,
-        style: TextStyle(letterSpacing: 1.0, height: 1.2)),
-    )
-    ;
+    return GestureDetector(
+//      onVerticalDragUpdate: (DragUpdateDetails detail){
+//        scrollController.jumpTo(scrollController.offset-detail.delta.dy);
+//      },
+      onPanDown: (_){
+        loadNextChapter();
+        currentChapterId = chapter.chapterId;
+      },
+      onTap: (){
+        hide =true;
+        Tools.updateUI(this);
+      },
+      onLongPress: () {
+        hide = false;
+        Tools.updateUI(this);
+      },
+      child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(chapter.title + "\n    " + chapter.content,
+          style: TextStyle(letterSpacing: 1.0, height: 1.2)),
+    ),);
   }
 }
 

@@ -39,19 +39,21 @@ class BookshelfState extends State<Bookshelf> {
 
   @override
   Widget build(BuildContext context) {
+    Widget widget;
     if(Global.shelfNovels.length==0){
-      return Center(child: Text("你还没有添加小说"),);
+      widget = Center(child: Text("你还没有添加小说"),);
     }else{
-      return Scaffold(
-        backgroundColor: Colors.white12,
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: Text("书架"),
-          centerTitle: true,
-        ),
-        body: Tools.listViewBuilder(Global.shelfNovels,onLongPress:_showDelDialog,onTap: Tools.openChapterDetail),
-      );
+      widget = Tools.listViewBuilder(Global.shelfNovels,onLongPress:_showDelDialog,onTap: Tools.openChapterDetail);
     }
+    return Scaffold(
+      backgroundColor: Colors.white12,
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: Text("书架"),
+        centerTitle: true,
+      ),
+      body: widget,
+    );
   }
 
 

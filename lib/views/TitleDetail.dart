@@ -25,9 +25,14 @@ class TitleDetailState extends State<TitleDetail>{
   void initState() {
     super.initState();
     titleScrollController = ScrollController();
+    titleScrollController.addListener((){
+
+    });
     titles = chapterDetailState.titles;
     titles = titles.sublist(chapterDetailState.currentChapterId-1);
   }
+
+
 
 
   @override
@@ -43,11 +48,10 @@ class TitleDetailState extends State<TitleDetail>{
               Text( "目录", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0), ),
               Expanded(
                 child: GestureDetector(
-                  onTapDown: (TapDownDetails _){
+                  onPanDown: (_){
                     if(titles.length!=chapterDetailState.titles.length){
                       titles = chapterDetailState.titles;
-                      Tools.updateUI(this,fn:(){
-                          titleScrollController.jumpTo(28.0*(chapterDetailState.currentChapterId-1));
+                      Tools.updateUI(this,fn:(){ titleScrollController.jumpTo(28.0*(chapterDetailState.currentChapterId-chapterDetailState.titles[0].chapterId));
                       });
                     }
                   },
@@ -64,7 +68,6 @@ class TitleDetailState extends State<TitleDetail>{
 
     );
   }
-  /// 目录
   Widget _chapterTitleItemBuilder(BuildContext context, int index) {
     Chapter chapter = titles[index];
     TextStyle textStyle = TextStyle(letterSpacing: 1.0, height: 1.2);

@@ -24,6 +24,7 @@ class Global{
 
   static void init(InitFn fn) async{
     prefs = await SharedPreferences.getInstance();
+    fn();
     /// 首先初始化tabs
     String tags = await HttpUtil.get(NovelAPI.getTags());
     List list = json.decode(tags);
@@ -34,8 +35,15 @@ class Global{
       pages.add(LibraryPage(tagid));
       map[tagid] = [];
       currentPages[tagid] = 1;
+      loadShowNovels(tagid);
     }
-    fn();
+
+  }
+  static void loadShowNovels(int tagid,{int page=1}) async {
+    String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(tagid,page));
+    List result  = json.decode(novels);
+    Global.map[tagid].addAll(result);
+    Global.currentPages[tagid] = page;
   }
 
 
