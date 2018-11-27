@@ -76,6 +76,7 @@ class TitleDetailState extends State<TitleDetail>{
     }
     return GestureDetector(
       onTap: () {
+        chapterDetailState.index = index;
         chapterDetailState.currentChapterId = chapter.chapterId;
         chapterDetailState.readChapters.clear();
         chapterDetailState.readChapters.addFirst(chapter);
