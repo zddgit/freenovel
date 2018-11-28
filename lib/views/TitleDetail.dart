@@ -4,7 +4,7 @@ import 'package:freenovel/views/ChapterDetail.dart';
 
 class TitleDetail extends StatefulWidget {
   ChapterDetailState chapterDetailState;
-  TitleDetail(this.chapterDetailState);
+  TitleDetail(this.chapterDetailState,{Key key}): super(key: key);
 
   @override
   TitleDetailState createState() {
@@ -25,11 +25,8 @@ class TitleDetailState extends State<TitleDetail>{
   void initState() {
     super.initState();
     titleScrollController = ScrollController();
-    titleScrollController.addListener((){
-
-    });
     titles = chapterDetailState.titles;
-    titles = titles.sublist(chapterDetailState.currentChapterId-1);
+    titles = titles.sublist(chapterDetailState.index);
   }
 
 
@@ -51,7 +48,7 @@ class TitleDetailState extends State<TitleDetail>{
                   onPanDown: (_){
                     if(titles.length!=chapterDetailState.titles.length){
                       titles = chapterDetailState.titles;
-                      Tools.updateUI(this,fn:(){ titleScrollController.jumpTo(28.0*(chapterDetailState.currentChapterId-chapterDetailState.titles[0].chapterId));
+                      Tools.updateUI(this,fn:(){ titleScrollController.jumpTo(28.0*(chapterDetailState.index));
                       });
                     }
                   },
@@ -71,26 +68,25 @@ class TitleDetailState extends State<TitleDetail>{
   Widget _chapterTitleItemBuilder(BuildContext context, int index) {
     Chapter chapter = titles[index];
     TextStyle textStyle = TextStyle(letterSpacing: 1.0, height: 1.2);
-    if(chapter.chapterId == chapterDetailState.currentChapterId){
+    if(chapter.chapterId == chapterDetailState.titles[chapterDetailState.index].chapterId){
       textStyle = TextStyle(letterSpacing: 1.0, height: 1.2,color: Colors.redAccent);
     }
-    return GestureDetector(
-      onTap: () {
-        chapterDetailState.index = index;
-        chapterDetailState.currentChapterId = chapter.chapterId;
-        chapterDetailState.readChapters.clear();
-        chapterDetailState.readChapters.addFirst(chapter);
-        chapterDetailState.scrollController.jumpTo(0.0);
-        chapterDetailState.getNovelDetail(chapter);
-        Navigator.of(context).pop();
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8.0,right: 10.0,top: 8.0),
-        child: Container(
-            height: 20.0,
-            decoration: BoxDecoration( border: Border(bottom: BorderSide(color: Colors.blueGrey))),
-            child: Text(chapter.title, style: textStyle,overflow: TextOverflow.ellipsis,)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(right: 10.0,top: 8.0),
+      child: Container(
+          height: 20.0,
+          decoration: BoxDecoration( border: Border(bottom: BorderSide(color: Colors.blueGrey))),
+          child: FlatButton(
+              onPressed: () {
+                chapterDetailState.index = index;
+                chapterDetailState.readChapters.clear();
+                chapterDetailState.readChapters.addFirst(chapter);
+                chapterDetailState.scrollController.jumpTo(2.0);
+                chapterDetailState.getNovelDetail(chapter);
+                Navigator.of(context).pop();
+              },
+              child: Text(chapter.title, style: textStyle,overflow: TextOverflow.ellipsis,)),),
+
     );
   }
 
