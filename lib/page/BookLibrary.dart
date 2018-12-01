@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/common/CommonSearchBarDelegate.dart';
-import 'package:freenovel/common/Tools.dart';
+import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 
@@ -20,10 +19,7 @@ class BookLibraryState extends State<BookLibrary>
     with SingleTickerProviderStateMixin {
   String queryName;
   List showNovels = [];
-//  List<Tab> tabs = Global.tabs;
-//  List<Widget> pages = Global.pages;
   TabController _controller;
-//  CommonSearchBarDelegate commonSearchBarDelegate;
   /// 滚动控制
   ScrollController scrollController;
   bool isload = true;
@@ -33,18 +29,10 @@ class BookLibraryState extends State<BookLibrary>
     super.initState();
     queryName = "";
     scrollController = ScrollController();
-//    commonSearchBarDelegate = new CommonSearchBarDelegate(query);
     _controller = TabController(length: Global.tabs.length, vsync: this);
-//    getRecommendNovels();
   }
 
 
-
-//  getRecommendNovels() async {
-//    String top10 = await HttpUtil.get(NovelAPI.getRecommentNovelsTop10());
-//    showNovels = json.decode(top10);
-//
-//  }
 
   getSearchNovels(String name,{page=1}) async {
     String searchNovels = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name,page));
@@ -55,31 +43,7 @@ class BookLibraryState extends State<BookLibrary>
     Tools.updateUI(this);
   }
 
-//  Widget query(query) {
-//    if (!query.isEmpty) {
-//      getSearchNovels(query);
-//    }
-//    onVerticalDragDown(DragDownDetails _) {
-//      // 这里指定快划到最后150像素的时候，进行加载
-//      double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
-//      if (isload && threshold < 100) {
-//        getSearchNovels(query);
-//      } else if(threshold < 10) {
-//        Fluttertoast.showToast(
-//            msg: "没有更多了",
-//            toastLength: Toast.LENGTH_SHORT,
-//            gravity: ToastGravity.BOTTOM,
-//            timeInSecForIos: 2,
-//            bgcolor: "#777777",
-//            textcolor: '#ffffff');
-//      }
-//    }
-//    return GestureDetector(
-//      onVerticalDragDown: onVerticalDragDown,
-//      child: Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController)
-////      Tools.listViewBuilder(showNovels,onLongPress:Tools.addToShelf,controller: scrollController),
-//    );
-//  }
+
 
 
   @override
@@ -137,9 +101,9 @@ class LibraryPageState extends State<LibraryPage> {
   void initState() {
     super.initState();
     scrollController = ScrollController();
-    scrollController.addListener((){
-      print("滑动监听");
-    });
+//    scrollController.addListener((){
+//      print("滑动监听");
+//    });
     if(Global.currentPages[_tagid]==1 && Global.map[_tagid].length==0){
       loadShowNovels(_tagid,currentPage);
     }

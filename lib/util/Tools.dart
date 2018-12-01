@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:freenovel/common/NovelSqlHelper.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/views/ChapterDetail.dart';

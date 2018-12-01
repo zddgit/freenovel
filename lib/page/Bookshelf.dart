@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/common/NovelSqlHelper.dart';
-import 'package:freenovel/common/Tools.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
+import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
 

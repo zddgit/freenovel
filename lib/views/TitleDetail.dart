@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:freenovel/common/Tools.dart';
+import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
 
 class TitleDetail extends StatefulWidget {

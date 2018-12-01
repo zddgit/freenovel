@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/common/NovelSqlHelper.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/page/MySelf.dart';
 import 'package:freenovel/page/Talk.dart';
@@ -47,6 +47,7 @@ class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "FreeNovel",
       home: Scaffold(
         body: _changBodyWidget(),
         bottomNavigationBar: Container(
@@ -54,14 +55,14 @@ class HomeState extends State<Home> {
           child: BottomNavigationBar(
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                  icon: Icon(Icons.add),
+                  icon: Icon(Icons.book),
                   title: Text("书架"),
-                  activeIcon: Icon(Icons.add_box),
+                  activeIcon: Icon(Icons.book),
                   backgroundColor: Colors.blue),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.account_balance),
+                  icon: Icon(Icons.list),
                   title: Text("书库"),
-                  activeIcon: Icon(Icons.account_balance_wallet),
+                  activeIcon: Icon(Icons.list),
                   backgroundColor: Colors.blue),
 //              BottomNavigationBarItem(
 //                  icon: Icon(Icons.find_in_page),

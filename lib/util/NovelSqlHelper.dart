@@ -6,8 +6,12 @@ class NovelSqlHelper{
   static String delNovelById = "delete from novel where id = ?";
   static String delChapterByNovelId = "delete from chapter where novelId = ?";
   static String saveNovel = "insert into novel (id,name,author,introduction,recentReadTime,readChapterId) values (?,?,?,?,?,1)";
+  static String saveChapter = "replace into chapter (novelId,chapterId,title,content) values (?,?,?,?)";
+  static String batchSaveChapter = "insert into chapter (novelId,chapterId,title) values ";
   static String updateReadChapterIdByNovelId = "update novel set readChapterId = ?,readPosition = ? where id = ?";
   static String updateUpdateTimeByNovelId = "update novel set updateTime = ? where id = ?";
   static String queryChaptersByNovelId = "select novelId,chapterId,title from chapter where novelId = ? ";
+  static String queryChapterByChapterIdAndNovel = "select novelId,chapterId,title,content from chapter where novelId = ? and chapterId= ? ";
+  static String queryNovelByNovelId = "select 1 from novel where id = ? ";
 
 }

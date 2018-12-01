@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/common/NovelSqlHelper.dart';
-import 'package:freenovel/common/Tools.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
+import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
@@ -41,8 +41,13 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 移动的距离
   double offset=0;
+  /// 屏幕的高度
   double screenHeight=0;
+  /// 屏幕顶部状态栏的高度
   double screenTop=0;
+  bool isExist = false;
+  SqfLiteHelper sqfLiteHelper;
+
 
 
 
@@ -51,16 +56,24 @@ class ChapterDetailState extends State<ChapterDetail> {
   @override
   void initState() {
     super.initState();
+    sqfLiteHelper = new SqfLiteHelper();
     novelId = novel["id"];
     scrollController = ScrollController();
     scrollController.addListener(loadChapter);
     readChapters = ListQueue<Chapter>();
-    offset = double.parse(novel["readPosition"].toString());
-    getNovel();
+    offset = novel["readPosition"]==null?0:double.parse(novel["readPosition"].toString());
+    init();
   }
 
   @override
   void dispose() {
+    super.dispose();
+    if(isExist){
+      saveNovel();
+    }
+  }
+  /// 退出保存信息
+  void saveNovel(){
     /// 此处退出的时候计算阅读位置
     double sum = 0;
     for(int i=0;i<readChapters.length;i++){
@@ -85,21 +98,60 @@ class ChapterDetailState extends State<ChapterDetail> {
         item["readPosition"] = offset.toInt();
       }
     });
-    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+
     sqfLiteHelper.update( NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId, [titles[index].chapterId,offset.toInt(), novelId]);
-    super.dispose();
+  }
+
+  /// 判断此小说是否加入书架
+  void init() async {
+    await getTitles();
+    await getNovel();
+    List list = await sqfLiteHelper.query( NovelSqlHelper.databaseName, NovelSqlHelper.queryNovelByNovelId,[novelId]);
+    if(list.length==0){
+      isExist = false;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('你想加入书架吗？'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('确定'),
+                onPressed: () {
+                  isExist = true;
+                  List args = [];
+                  args.add(novel["id"]);
+                  args.add(novel["name"]);
+                  args.add(novel["author"]);
+                  args.add(novel["introduction"]);
+                  args.add(Tools.now());
+                  sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('取消'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }else{
+      isExist = true;
+    }
   }
 
   getNovel() async {
-    await getTitles();
     readChapters.addLast(titles[index]);
     getNovelDetail(readChapters.elementAt(0));
   }
 
   getTitles() async {
-    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName,
-        NovelSqlHelper.queryChaptersByNovelId, [novelId]);
+    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryChaptersByNovelId, [novelId]);
     if (list == null || list.length == 0) {
       String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
       list = json.decode(titlesJsonStr);
@@ -121,7 +173,7 @@ class ChapterDetailState extends State<ChapterDetail> {
 
       String values = sb.toString();
       values = values.substring(0, values.length - 1);
-      sqfLiteHelper.insert(NovelSqlHelper.databaseName, "insert into chapter (novelId,chapterId,title) values $values");
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
       sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
     } else {
       for (int i = 0; i < list.length; i++) {
@@ -140,6 +192,7 @@ class ChapterDetailState extends State<ChapterDetail> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenTop = MediaQuery.of(context).padding.top;
+    print("build:"+readChapters.toString());
     return Scaffold(
         backgroundColor: Colors.teal[100],
         drawer: TitleDetail(this),
@@ -225,10 +278,18 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 网络获取章节内容
   Future<void> getNovelDetail(Chapter ch,{fn}) async {
-    String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId ?? 1));
-    var result = json.decode(content);
-    ch.content = result["content_str"];
-    ch.title = result["title"];
+    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChapterByChapterIdAndNovel,[ch.novelId, ch.chapterId ?? 1]);
+    print("list:$list");
+    if(list.length==1){
+      ch.content = list.elementAt(0)["content"]??"";
+      ch.title = list.elementAt(0)["title"];
+    }else{
+      String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId ?? 1));
+      var result = json.decode(content);
+      ch.content = result["content_str"];
+      ch.title = result["title"];
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveChapter,[ch.novelId,ch.chapterId,ch.title,ch.content]);
+    }
     scrollController.jumpTo(offset);
     Tools.updateUI(this, fn: fn);
   }
@@ -249,16 +310,14 @@ class ChapterDetailState extends State<ChapterDetail> {
       highlightColor: Colors.teal[100],
       onPressed: () {
         hide = !hide;
-        print(globalKey.currentContext.size);
-        print(scrollController.position.maxScrollExtent);
-        print(MediaQuery.of(context).padding.top);
-        print(scrollController.offset);
         Tools.updateUI(this);
       },
       child: Text(chapter.title + "\n    " + chapter.content,
           style: TextStyle(letterSpacing: 1.0, height: 1.2, fontSize: 18)),
     );
   }
+
+
 }
 
 /// 章节内容
@@ -283,7 +342,7 @@ class Chapter {
 
   @override
   String toString() {
-    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, globalKey: $globalKey, height: $height}';
+    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, content: $content, globalKey: $globalKey, height: $height}';
   }
 
 
