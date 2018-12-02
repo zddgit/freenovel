@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
+import 'package:freenovel/page/booksearch.dart';
 import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
@@ -51,7 +52,7 @@ class BookLibraryState extends State<BookLibrary>
     return Scaffold(
         floatingActionButton: new FloatingActionButton(
             onPressed: () {
-
+              Tools.pushPage(context, new BookSearch());
             },
             child: new Icon(Icons.search),
           ),

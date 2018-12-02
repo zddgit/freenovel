@@ -117,9 +117,13 @@ class Tools {
   /// 打开章节详情页
   static void openChapterDetail(int index,List novels,BuildContext context) {
     var novel = novels[index];
+    pushPage(context, new ChapterDetail(novel));
+  }
+
+  static void pushPage(BuildContext context,var page){
     Navigator.of(context).push(
         new PageRouteBuilder(
-            pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) { return new ChapterDetail(novel);},
+            pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) { return page;},
             transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
               return new FadeTransition(
                 opacity: animation,

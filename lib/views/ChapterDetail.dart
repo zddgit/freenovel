@@ -105,7 +105,7 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// 判断此小说是否加入书架
   void init() async {
     await getTitles();
-    await getNovel();
+    getNovel();
     List list = await sqfLiteHelper.query( NovelSqlHelper.databaseName, NovelSqlHelper.queryNovelByNovelId,[novelId]);
     if(list.length==0){
       isExist = false;
@@ -192,7 +192,6 @@ class ChapterDetailState extends State<ChapterDetail> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenTop = MediaQuery.of(context).padding.top;
-    print("build:"+readChapters.toString());
     return Scaffold(
         backgroundColor: Colors.teal[100],
         drawer: TitleDetail(this),
@@ -279,9 +278,8 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// 网络获取章节内容
   Future<void> getNovelDetail(Chapter ch,{fn}) async {
     List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChapterByChapterIdAndNovel,[ch.novelId, ch.chapterId ?? 1]);
-    print("list:$list");
-    if(list.length==1){
-      ch.content = list.elementAt(0)["content"]??"";
+    if(list.length==1 && list.elementAt(0)["content"] !=null){
+      ch.content = list.elementAt(0)["content"];
       ch.title = list.elementAt(0)["title"];
     }else{
       String content = await HttpUtil.get(NovelAPI.getNovelDetail(ch.novelId, ch.chapterId ?? 1));
