@@ -88,7 +88,7 @@ class LibraryPage extends StatefulWidget {
   }
 }
 
-class LibraryPageState extends State<LibraryPage> {
+class LibraryPageState extends State<LibraryPage> with AutomaticKeepAliveClientMixin {
   int _tagid;
   int currentPage = 1;
   bool isload = true;
@@ -99,12 +99,12 @@ class LibraryPageState extends State<LibraryPage> {
   LibraryPageState(this._tagid);
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     scrollController = ScrollController();
-//    scrollController.addListener((){
-//      print("滑动监听");
-//    });
     if(Global.currentPages[_tagid]==1 && Global.map[_tagid].length==0){
       loadShowNovels(_tagid,currentPage);
     }

@@ -55,7 +55,8 @@ class BookSearchState extends State<BookSearch> {
             ),
             getRecommend(),
             getRecommend(),
-            Container(color: Colors.blueGrey[200],height: 4.0,margin: EdgeInsets.only(top: 10.0),),
+            Divider(color: Colors.grey),
+//            Container(color: Colors.blueGrey[200],height: 4.0,margin: EdgeInsets.only(top: 10.0),),
             Container(
               padding: const EdgeInsets.only(left: 16.0, top: 12.0),
               child: Row(

@@ -10,6 +10,7 @@ import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/views/TitleDetail.dart';
+import 'package:loadmore/loadmore.dart';
 
 /// 文章主体页面
 class ChapterDetail extends StatefulWidget {
@@ -27,6 +28,7 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// 当前所读小说的id和章节id
   final Map novel;
   int novelId;
+  int chapterId;
 
   /// 目录章节标题
   List<Chapter> titles = [];
@@ -37,6 +39,7 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// 滚动控制
   ScrollController scrollController;
   bool hide = true;
+  /// 目录看到的索引
   int index = 0;
 
   /// 移动的距离
@@ -48,18 +51,21 @@ class ChapterDetailState extends State<ChapterDetail> {
   bool isExist = false;
   SqfLiteHelper sqfLiteHelper;
 
-
-
+  /// 是否加载下一章
+  bool isFinish  = false;
 
   ChapterDetailState(this.novel);
+
+
 
   @override
   void initState() {
     super.initState();
     sqfLiteHelper = new SqfLiteHelper();
     novelId = novel["id"];
+    chapterId = novel["readChapterId"];
     scrollController = ScrollController();
-    scrollController.addListener(loadChapter);
+//    scrollController.addListener(loadChapter);
     readChapters = ListQueue<Chapter>();
     offset = novel["readPosition"]==null?0:double.parse(novel["readPosition"].toString());
     init();
@@ -71,6 +77,7 @@ class ChapterDetailState extends State<ChapterDetail> {
     if(isExist){
       saveNovel();
     }
+
   }
   /// 退出保存信息
   void saveNovel(){
@@ -104,49 +111,31 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 判断此小说是否加入书架
   void init() async {
-    await getTitles();
-    getNovel();
+    if(offset==0||chapterId==null){
+      await initOffSetAndReaderchapterId();
+    }
+    await getNovel();
+    scrollController.jumpTo(offset);
+    getTitles();
     List list = await sqfLiteHelper.query( NovelSqlHelper.databaseName, NovelSqlHelper.queryNovelByNovelId,[novelId]);
     if(list.length==0){
       isExist = false;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('你想加入书架吗？'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('确定'),
-                onPressed: () {
-                  isExist = true;
-                  List args = [];
-                  args.add(novel["id"]);
-                  args.add(novel["name"]);
-                  args.add(novel["author"]);
-                  args.add(novel["introduction"]);
-                  args.add(Tools.now());
-                  sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text('取消'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
     }else{
       isExist = true;
     }
   }
 
+  initOffSetAndReaderchapterId() async {
+    List list = await sqfLiteHelper.query( NovelSqlHelper.databaseName, NovelSqlHelper.queryReadPositionByNovelId,[novelId]);
+    if(list.length==1){
+      offset = double.parse(list.elementAt(0)["readPosition"].toString());
+      chapterId = int.parse(list.elementAt(0)["readChapterId"].toString());
+      novel["readChapterId"] = chapterId;
+    }
+  }
+
   getNovel() async {
-    readChapters.addLast(titles[index]);
+    readChapters.addLast(Chapter(chapterId??1, novelId, ""));
     getNovelDetail(readChapters.elementAt(0));
   }
 
@@ -158,7 +147,7 @@ class ChapterDetailState extends State<ChapterDetail> {
       StringBuffer sb = new StringBuffer();
       for (int i = 0; i < list.length; i++) {
         var item = list[i];
-        if (item['chapterId'] == novel["readChapterId"]) {
+        if (item['chapterId'] == novel["readChapterId"] ) {
           index = i;
         }
         Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
@@ -192,44 +181,100 @@ class ChapterDetailState extends State<ChapterDetail> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenTop = MediaQuery.of(context).padding.top;
-    return Scaffold(
-        backgroundColor: Colors.teal[100],
-        drawer: TitleDetail(this),
-        body: Builder(builder: (BuildContext context) {
-          return Stack(
-            children: <Widget>[
-              Container(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: readChapters == null ? 0 : readChapters.length,
-                  itemBuilder: _chapterContentitemBuilder,
-                ),
-              ),
-              Offstage(
-                offstage: hide,
-                child: Container(
-                  color: Colors.black,
-                  width: MediaQuery.of(context).size.width,
-                  height: 60.0,
-                  child: Row(children: <Widget>[
-                    IconButton(
-                        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top, left: 8.0),
-                        alignment: Alignment.centerLeft,
-                        icon: Icon( Icons.keyboard_backspace, color: Colors.white,),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }),
-                  ]),
-                ),
-              )
-            ],
+    return WillPopScope(
+      onWillPop: (){
+        if(!isExist){
+          return showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('你想加入书架吗？'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('确定'),
+                    onPressed: () {
+                      isExist = true;
+                      List args = [];
+                      args.add(novel["id"]);
+                      args.add(novel["name"]);
+                      args.add(novel["author"]);
+                      args.add(novel["introduction"]);
+                      args.add(Tools.now());
+                      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
+                      Navigator.of(context).pop(true);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text('取消'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                  ),
+                ],
+              );
+            },
           );
-        }));
+        }else{
+          return Future.value(true);
+        }
+      },
+      child: Scaffold(
+          backgroundColor: Colors.teal[100],
+          drawer: TitleDetail(this),
+          body: Builder(builder: (BuildContext context) {
+            return Stack(
+              children: <Widget>[
+                LoadMore(
+                  isFinish: isFinish,
+                  onLoadMore: loadMoreChapter,
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: readChapters == null ? 0 : readChapters.length,
+                    itemBuilder: _chapterContentitemBuilder,
+                  ),
+                ),
+                Offstage(
+                  offstage: hide,
+                  child: Container(
+                    color: Colors.black,
+                    width: MediaQuery.of(context).size.width,
+                    height: 60.0,
+                    child: Row(children: <Widget>[
+                      IconButton(
+                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top, left: 8.0),
+                          alignment: Alignment.centerLeft,
+                          icon: Icon( Icons.keyboard_backspace, color: Colors.white,),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          }),
+                    ]),
+                  ),
+                )
+              ],
+            );
+          })),
+    );
+  }
+
+  Future<bool> loadMoreChapter() async{
+    offset = scrollController.offset;
+    await Future.delayed(Duration(seconds: 10, milliseconds: 100));
+    if(index<titles.length){
+      index++;
+      Chapter ch = titles[index];
+      readChapters.addLast(ch);
+      getNovelDetail(ch);
+    }else{
+      isFinish = true;
+      Tools.updateUI(this);
+    }
+    return true;
   }
 
 
-
   loadChapter() {
+    // TODO 加载时机 isFinish 在这里修改，思路，当拉到最后的时候，isFinish = false ,当加载出来以后再把isFinish 设为 true
     offset = scrollController.offset;
     // 当读到最后一章得时候进行加载
     double threshold = scrollController.position.maxScrollExtent - offset;
@@ -277,7 +322,7 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 网络获取章节内容
   Future<void> getNovelDetail(Chapter ch,{fn}) async {
-    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChapterByChapterIdAndNovel,[ch.novelId, ch.chapterId ?? 1]);
+    List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChapterByChapterIdAndNovel,[ch.novelId,ch.chapterId]);
     if(list.length==1 && list.elementAt(0)["content"] !=null){
       ch.content = list.elementAt(0)["content"];
       ch.title = list.elementAt(0)["title"];
@@ -288,21 +333,21 @@ class ChapterDetailState extends State<ChapterDetail> {
       ch.title = result["title"];
       sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveChapter,[ch.novelId,ch.chapterId,ch.title,ch.content]);
     }
-    scrollController.jumpTo(offset);
     Tools.updateUI(this, fn: fn);
   }
 
   /// 章节内容
   Widget _chapterContentitemBuilder(BuildContext context, int index) {
     Chapter chapter = readChapters.elementAt(index);
-    GlobalKey globalKey = new GlobalKey();
-    chapter.globalKey = globalKey;
-    Duration duration = new Duration(milliseconds: 200);
+    if(chapter.globalKey==null){
+      chapter.globalKey = new GlobalKey();
+    }
+    Duration duration = new Duration(milliseconds: 1000);
     new Future.delayed(duration,(){
-      chapter.height = globalKey.currentContext.size.height;
+      chapter.height = chapter.globalKey.currentContext.size.height;
     });
     return FlatButton(
-      key: globalKey,
+      key: chapter.globalKey,
       padding: EdgeInsets.only(left: 4.0),
       splashColor: Colors.teal[100],
       highlightColor: Colors.teal[100],
@@ -310,7 +355,7 @@ class ChapterDetailState extends State<ChapterDetail> {
         hide = !hide;
         Tools.updateUI(this);
       },
-      child: Text(chapter.title + "\n    " + chapter.content,
+      child: Text((chapter.title??"") + "\n    " + (chapter.content??""),
           style: TextStyle(letterSpacing: 1.0, height: 1.2, fontSize: 18)),
     );
   }
