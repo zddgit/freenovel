@@ -2,13 +2,12 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/util/NovelSqlHelper.dart';
-import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
+import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/views/TitleDetail.dart';
 import 'package:loadmore/loadmore.dart';
 
@@ -52,7 +51,7 @@ class ChapterDetailState extends State<ChapterDetail> {
   SqfLiteHelper sqfLiteHelper;
 
   /// 是否加载下一章
-  bool isFinish  = false;
+  bool isFinish  = true;
 
   ChapterDetailState(this.novel);
 
@@ -65,7 +64,7 @@ class ChapterDetailState extends State<ChapterDetail> {
     novelId = novel["id"];
     chapterId = novel["readChapterId"];
     scrollController = ScrollController();
-//    scrollController.addListener(loadChapter);
+    scrollController.addListener(loadChapterListen);
     readChapters = ListQueue<Chapter>();
     offset = novel["readPosition"]==null?0:double.parse(novel["readPosition"].toString());
     init();
@@ -105,7 +104,6 @@ class ChapterDetailState extends State<ChapterDetail> {
         item["readPosition"] = offset.toInt();
       }
     });
-
     sqfLiteHelper.update( NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId, [titles[index].chapterId,offset.toInt(), novelId]);
   }
 
@@ -223,100 +221,41 @@ class ChapterDetailState extends State<ChapterDetail> {
           backgroundColor: Colors.teal[100],
           drawer: TitleDetail(this),
           body: Builder(builder: (BuildContext context) {
-            return Stack(
-              children: <Widget>[
-                LoadMore(
-                  isFinish: isFinish,
-                  onLoadMore: loadMoreChapter,
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: readChapters == null ? 0 : readChapters.length,
-                    itemBuilder: _chapterContentitemBuilder,
-                  ),
-                ),
-                Offstage(
-                  offstage: hide,
-                  child: Container(
-                    color: Colors.black,
-                    width: MediaQuery.of(context).size.width,
-                    height: 60.0,
-                    child: Row(children: <Widget>[
-                      IconButton(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top, left: 8.0),
-                          alignment: Alignment.centerLeft,
-                          icon: Icon( Icons.keyboard_backspace, color: Colors.white,),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          }),
-                    ]),
-                  ),
-                )
-              ],
+            return LoadMore(
+              isFinish: isFinish,
+              onLoadMore: loadMoreChapter,
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: readChapters == null ? 0 : readChapters.length,
+                itemBuilder: _chapterContentitemBuilder,
+              ),
             );
           })),
     );
   }
 
   Future<bool> loadMoreChapter() async{
-    offset = scrollController.offset;
-    await Future.delayed(Duration(seconds: 10, milliseconds: 100));
     if(index<titles.length){
       index++;
       Chapter ch = titles[index];
       readChapters.addLast(ch);
-      getNovelDetail(ch);
-    }else{
       isFinish = true;
-      Tools.updateUI(this);
+      await getNovelDetail(ch);
     }
+    await Future.delayed(Duration(milliseconds: 100));
     return true;
   }
 
 
-  loadChapter() {
-    // TODO 加载时机 isFinish 在这里修改，思路，当拉到最后的时候，isFinish = false ,当加载出来以后再把isFinish 设为 true
+  loadChapterListen() {
     offset = scrollController.offset;
     // 当读到最后一章得时候进行加载
     double threshold = scrollController.position.maxScrollExtent - offset;
-    if (threshold == 0 && index < titles.length) {
-      index++;
-      Chapter ch = titles[index];
-      readChapters.addLast(ch);
-      getNovelDetail(ch);
-    }else if(scrollController.offset==0 && index > 0){
-      Fluttertoast.showToast(
-          msg: "加载中。。。。",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIos: 1,
-          bgcolor: "#777777",
-          textcolor: '#ffffff');
-      index--;
-      Chapter ch = titles[index];
-      fn(){
-        var duration = new Duration(milliseconds: 80);
-        new Future.delayed(duration, () {
-          scrollController.animateTo(ch.globalKey.currentContext.size.height, duration: new Duration(milliseconds: 100), curve: Curves.decelerate);
-        });
-      }
-      readChapters.addFirst(ch);
-      getNovelDetail(ch,fn: fn);
-    }else if(scrollController.offset==0 && index == 0){
-      Fluttertoast.showToast(
-          msg: "已经是第一章了",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIos: 2,
-          bgcolor: "#777777",
-          textcolor: '#ffffff');
-    } else if (index == titles.length) {
-      Fluttertoast.showToast(
-          msg: "已经最后一章了",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIos: 1,
-          bgcolor: "#777777",
-          textcolor: '#ffffff');
+    if(threshold == 0 && index < titles.length){
+      isFinish = false;
+      Tools.updateUI(this);
+    }else{
+      isFinish = true;
     }
   }
 
@@ -344,19 +283,13 @@ class ChapterDetailState extends State<ChapterDetail> {
     }
     Duration duration = new Duration(milliseconds: 1000);
     new Future.delayed(duration,(){
-      chapter.height = chapter.globalKey.currentContext.size.height;
+        chapter.height = chapter.globalKey.currentContext.size.height;
     });
-    return FlatButton(
-      key: chapter.globalKey,
-      padding: EdgeInsets.only(left: 4.0),
-      splashColor: Colors.teal[100],
-      highlightColor: Colors.teal[100],
-      onPressed: () {
-        hide = !hide;
-        Tools.updateUI(this);
-      },
-      child: Text((chapter.title??"") + "\n    " + (chapter.content??""),
-          style: TextStyle(letterSpacing: 1.0, height: 1.2, fontSize: 18)),
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+      child: Text((chapter.title ?? "") + "\n    " + (chapter.content ?? ""),
+        style: TextStyle(letterSpacing: 1.0, height: 1.2, fontSize: 18),
+        key: chapter.globalKey,),
     );
   }
 
@@ -385,7 +318,8 @@ class Chapter {
 
   @override
   String toString() {
-    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, content: $content, globalKey: $globalKey, height: $height}';
+    String contentStr = content.substring(0,10);
+    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, content: $contentStr, globalKey: $globalKey, height: $height}';
   }
 
 
