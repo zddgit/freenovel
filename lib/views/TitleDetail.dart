@@ -12,7 +12,7 @@ class TitleDetail extends StatefulWidget {
   }
 
 }
-class TitleDetailState extends State<TitleDetail>{
+class TitleDetailState extends State<TitleDetail> {
   ChapterDetailState chapterDetailState;
   ScrollController titleScrollController;
   /// 目录章节标题

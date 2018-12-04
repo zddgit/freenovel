@@ -27,7 +27,8 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// 当前所读小说的id和章节id
   final Map novel;
   int novelId;
-  int chapterId;
+  int currentReadChapterId;
+  String currentTitle="";
 
   /// 目录章节标题
   List<Chapter> titles = [];
@@ -62,9 +63,9 @@ class ChapterDetailState extends State<ChapterDetail> {
     super.initState();
     sqfLiteHelper = new SqfLiteHelper();
     novelId = novel["id"];
-    chapterId = novel["readChapterId"];
+    currentReadChapterId = novel["readChapterId"];
     scrollController = ScrollController();
-    scrollController.addListener(loadChapterListen);
+    scrollController.addListener(slideListen);
     readChapters = ListQueue<Chapter>();
     offset = novel["readPosition"]==null?0:double.parse(novel["readPosition"].toString());
     init();
@@ -88,8 +89,10 @@ class ChapterDetailState extends State<ChapterDetail> {
         sum = sum + item.height;
         if(sum+screenTop>screenHeight+offset){
           if(i==0){
+            currentReadChapterId = item.chapterId;
             break;
           }else{
+            currentReadChapterId = item.chapterId;
             offset = (screenHeight+offset)-(sum+screenTop-item.height);
           }
           break;
@@ -100,16 +103,16 @@ class ChapterDetailState extends State<ChapterDetail> {
     /// 退出阅读页面的时候保存阅读信息
     Global.shelfNovels.forEach((item) {
       if (item["id"] == novelId) {
-        item["readChapterId"] = titles[index].chapterId;
+        item["readChapterId"] = currentReadChapterId;
         item["readPosition"] = offset.toInt();
       }
     });
-    sqfLiteHelper.update( NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId, [titles[index].chapterId,offset.toInt(), novelId]);
+    sqfLiteHelper.update( NovelSqlHelper.databaseName, NovelSqlHelper.updateReadChapterIdByNovelId, [currentReadChapterId,offset.toInt(), novelId]);
   }
 
   /// 判断此小说是否加入书架
   void init() async {
-    if(offset==0||chapterId==null){
+    if(offset==0||currentReadChapterId==null){
       await initOffSetAndReaderchapterId();
     }
     await getNovel();
@@ -127,13 +130,13 @@ class ChapterDetailState extends State<ChapterDetail> {
     List list = await sqfLiteHelper.query( NovelSqlHelper.databaseName, NovelSqlHelper.queryReadPositionByNovelId,[novelId]);
     if(list.length==1){
       offset = double.parse(list.elementAt(0)["readPosition"].toString());
-      chapterId = int.parse(list.elementAt(0)["readChapterId"].toString());
-      novel["readChapterId"] = chapterId;
+      currentReadChapterId = int.parse(list.elementAt(0)["readChapterId"].toString());
+      novel["readChapterId"] = currentReadChapterId;
     }
   }
 
   getNovel() async {
-    readChapters.addLast(Chapter(chapterId??1, novelId, ""));
+    readChapters.addLast(Chapter(currentReadChapterId??1, novelId, ""));
     getNovelDetail(readChapters.elementAt(0));
   }
 
@@ -147,6 +150,7 @@ class ChapterDetailState extends State<ChapterDetail> {
         var item = list[i];
         if (item['chapterId'] == novel["readChapterId"] ) {
           index = i;
+          currentTitle = item["title"];
         }
         Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
         chapter.globalKey = new GlobalKey();
@@ -167,18 +171,21 @@ class ChapterDetailState extends State<ChapterDetail> {
         var item = list[i];
         if (item['chapterId'] == novel["readChapterId"]) {
           index = i;
+          currentTitle = item["title"];
         }
         Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
         chapter.globalKey = new GlobalKey();
         titles.add(chapter);
       }
     }
+    Tools.updateUI(this);
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenTop = MediaQuery.of(context).padding.top;
+    currentTitle = currentTitle==null?"":currentTitle;
     return WillPopScope(
       onWillPop: (){
         if(!isExist){
@@ -218,6 +225,20 @@ class ChapterDetailState extends State<ChapterDetail> {
         }
       },
       child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(40.0),
+            child: AppBar(
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed:(){
+                  Navigator.of(context).pop();
+                }),
+            title: Center(child: Text(currentTitle,style: TextStyle(color: Colors.black26,fontSize: 16.0),)),
+            actions: <Widget>[
+              IconButton(icon: Icon(Icons.settings), onPressed:(){
+              })
+            ],
+          ),),
           backgroundColor: Colors.teal[100],
           drawer: TitleDetail(this),
           body: Builder(builder: (BuildContext context) {
@@ -246,17 +267,48 @@ class ChapterDetailState extends State<ChapterDetail> {
     return true;
   }
 
-
-  loadChapterListen() {
+  /// 滑动检测
+  slideListen() {
     offset = scrollController.offset;
+    updateCurrentTitle();
     // 当读到最后一章得时候进行加载
     double threshold = scrollController.position.maxScrollExtent - offset;
     if(threshold == 0 && index < titles.length){
+      // 此标志位是用来判断是否加载下一章的
       isFinish = false;
       Tools.updateUI(this);
     }else{
       isFinish = true;
     }
+  }
+  void updateCurrentTitle(){
+    //根据更新滑动来判断当前看到那里
+    double sum = 0;
+    String title;
+    for(int i=0;i<readChapters.length;i++){
+      Chapter item = readChapters.elementAt(i);
+      if(item.height!=null){
+        sum = sum + item.height;
+        if(sum+screenTop>screenHeight+offset){
+          if(i==0){
+            currentReadChapterId = item.chapterId;
+            title = item.title;
+            break;
+          }else{
+            currentReadChapterId = item.chapterId;
+            title = item.title;
+            offset = (screenHeight+offset)-(sum+screenTop-item.height);
+          }
+          break;
+        }
+
+      }
+    }
+    if(title != currentTitle && title!=null){
+        currentTitle = title;
+        Tools.updateUI(this);
+    }
+
   }
 
   /// 网络获取章节内容

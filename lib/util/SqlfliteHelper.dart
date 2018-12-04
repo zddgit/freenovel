@@ -70,7 +70,7 @@ class SqfLiteHelper {
     sqflite.Database db = await _getDB(dbName);
     db.setVersion(version);
     for (String sql in sqls) {
-      await db.execute(sql);
+      db.execute(sql);
     }
   }
 
