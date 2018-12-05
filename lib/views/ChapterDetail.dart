@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
+import 'package:freenovel/util/CoustomSlider.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/NovelSqlHelper.dart';
@@ -53,9 +54,27 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 是否加载下一章
   bool isFinish  = true;
+  int fontsize = Global.fontsize;
 
   ChapterDetailState(this.novel);
 
+  updateFontSize(){
+    Global.fontsize = fontsize;
+    Global.prefs.setInt("fontsize", fontsize);
+    Tools.updateUI(this);
+  }
+
+  void showSetFontSizeSlider(){
+    showDialog(
+      context: context,
+      builder: (context)=> Dialog(
+        child: Container(
+          height: 20.0,
+          child: CoustomSlider(this),
+        ),
+      ),
+    );
+  }
 
 
   @override
@@ -233,8 +252,7 @@ class ChapterDetailState extends State<ChapterDetail> {
                 }),
             title: Center(child: Text(currentTitle,style: TextStyle(color: Colors.black26,fontSize: 16.0),)),
             actions: <Widget>[
-              IconButton(icon: Icon(Icons.settings), onPressed:(){
-              })
+              IconButton(icon: Icon(Icons.settings), onPressed:showSetFontSizeSlider)
             ],
           ),),
           backgroundColor: Colors.teal[100],
@@ -340,7 +358,7 @@ class ChapterDetailState extends State<ChapterDetail> {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
       child: Text((chapter.title ?? "") + "\n    " + (chapter.content ?? ""),
-        style: TextStyle(letterSpacing: 1.0, height: 1.2, fontSize: 18),
+        style: TextStyle(letterSpacing: 1.0, height: 1.2, fontSize: fontsize.toDouble()),
         key: chapter.globalKey,),
     );
   }
@@ -376,3 +394,4 @@ class Chapter {
 
 
 }
+

@@ -17,6 +17,8 @@ class Global{
   /// 书库标签对应的刷到第几页了
   static Map<int,int> currentPages = new Map();
 
+  static int fontsize = 18;
+
   /// 书架小说列表
   static List shelfNovels=[];
 

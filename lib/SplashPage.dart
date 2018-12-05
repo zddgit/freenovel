@@ -17,10 +17,12 @@ class SplashPage extends StatefulWidget {
 class SplashPageState extends State<SplashPage> {
   int seconds = 5;
   Timer timer;
+  int fontsize = 10;
+
 
   @override
   Widget build(BuildContext context) {
-    double left = MediaQuery.of(context).size.width * 0.75;
+    double left = MediaQuery.of(context).size.width * 0.65;
     return new Scaffold(
       body: Column(
         children: <Widget>[
@@ -33,17 +35,12 @@ class SplashPageState extends State<SplashPage> {
                     Center(child: Image.asset("images/icon_logo.png"),),
                     Padding(
                       padding: EdgeInsets.only(left: left, top: 60.0),
-                      child: GestureDetector(
-                        onTap: (){
-                          goToHomePage();
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.black26,
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0))),
-                            padding: const EdgeInsets.only(left: 12.0, top: 8.0, right: 12.0, bottom: 8.0),
-                            child: Text("跳过$seconds")),),
+                      child: FlatButton(
+                        onPressed:goToHomePage,
+                        color: Colors.black26,
+                        child: Text("$seconds秒|跳过"),
+                      ),
+
                     )
                   ],),
                 ),
@@ -60,6 +57,7 @@ class SplashPageState extends State<SplashPage> {
       ),
     );
   }
+
 
   @override
   void initState() {
@@ -87,6 +85,10 @@ class SplashPageState extends State<SplashPage> {
       Global.prefs.setString("database", NovelSqlHelper.databaseName);
       print("生成数据库${NovelSqlHelper.databaseName}");
     }
+    int fontsize = Global.prefs.getInt("fontsize");
+    if(fontsize!=null){
+      Global.fontsize = fontsize;
+    }
   }
 
 //  void countDown() {
@@ -102,3 +104,4 @@ class SplashPageState extends State<SplashPage> {
             (Route<dynamic> rout) => false);
   }
 }
+
