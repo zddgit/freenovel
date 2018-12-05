@@ -18,7 +18,7 @@ class Global{
   static Map<int,int> currentPages = new Map();
 
   /// 书架小说列表
-  static List shelfNovels;
+  static List shelfNovels=[];
 
   static SharedPreferences prefs;
 

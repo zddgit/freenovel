@@ -1,10 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/util/NovelSqlHelper.dart';
-import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
-import 'package:freenovel/views/ChapterDetail.dart';
+import 'package:freenovel/util/Tools.dart';
 
 class Bookshelf extends StatefulWidget {
   @override
@@ -23,18 +21,19 @@ class BookshelfState extends State<Bookshelf> {
 
 
   initNovels() async {
-    Global.shelfNovels = [];
-    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    List result = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryRecentReadNovel);
-    result.forEach((item){
-      Map map = new Map();
-      item.keys.forEach((key){
-        map[key] = item[key];
+    if(Global.shelfNovels.length==0){
+      SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+      List result = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryRecentReadNovel);
+      result.forEach((item){
+        Map map = new Map();
+        item.keys.forEach((key){
+          map[key] = item[key];
+        });
+        Global.shelfNovels.add(map);
       });
-      Global.shelfNovels.add(map);
-    });
-    //更新
-    Tools.updateUI(this);
+      //更新
+      Tools.updateUI(this);
+    }
   }
 
   @override

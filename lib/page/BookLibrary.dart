@@ -125,7 +125,7 @@ class LibraryPageState extends State<LibraryPage> with AutomaticKeepAliveClientM
   Widget build(BuildContext context) {
     return GestureDetector(
       onVerticalDragDown: onVerticalDragDown,
-      child: Tools.listViewBuilder(Global.map[_tagid],onLongPress:Tools.addToShelf,controller: scrollController,onTap: Tools.openChapterDetail),
+      child: Tools.listViewBuilder(Global.map[_tagid],controller: scrollController,onTap: Tools.openChapterDetail),
     );
   }
   onVerticalDragDown(DragDownDetails _) {

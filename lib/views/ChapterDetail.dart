@@ -63,11 +63,20 @@ class ChapterDetailState extends State<ChapterDetail> {
     super.initState();
     sqfLiteHelper = new SqfLiteHelper();
     novelId = novel["id"];
-    currentReadChapterId = novel["readChapterId"];
+    // 判断当前看的书是不是在书架里面
+    bool flag = false;
+    Global.shelfNovels.forEach((item){
+      if(novelId == item["id"]){
+        flag = true;
+      }
+    });
+    if(flag){
+      currentReadChapterId = novel["readChapterId"];
+      offset = novel["readPosition"]==null?0:double.parse(novel["readPosition"].toString());
+    }
     scrollController = ScrollController();
     scrollController.addListener(slideListen);
     readChapters = ListQueue<Chapter>();
-    offset = novel["readPosition"]==null?0:double.parse(novel["readPosition"].toString());
     init();
   }
 
@@ -81,25 +90,6 @@ class ChapterDetailState extends State<ChapterDetail> {
   }
   /// 退出保存信息
   void saveNovel(){
-    /// 此处退出的时候计算阅读位置
-    double sum = 0;
-    for(int i=0;i<readChapters.length;i++){
-      Chapter item = readChapters.elementAt(i);
-      if(item.height!=null){
-        sum = sum + item.height;
-        if(sum+screenTop>screenHeight+offset){
-          if(i==0){
-            currentReadChapterId = item.chapterId;
-            break;
-          }else{
-            currentReadChapterId = item.chapterId;
-            offset = (screenHeight+offset)-(sum+screenTop-item.height);
-          }
-          break;
-        }
-
-      }
-    }
     /// 退出阅读页面的时候保存阅读信息
     Global.shelfNovels.forEach((item) {
       if (item["id"] == novelId) {
@@ -148,9 +138,10 @@ class ChapterDetailState extends State<ChapterDetail> {
       StringBuffer sb = new StringBuffer();
       for (int i = 0; i < list.length; i++) {
         var item = list[i];
-        if (item['chapterId'] == novel["readChapterId"] ) {
+        if (item['chapterId'] == (novel["readChapterId"]??1) ) {
           index = i;
           currentTitle = item["title"];
+          currentReadChapterId = item["chapterId"];
         }
         Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
         chapter.globalKey = new GlobalKey();
@@ -169,16 +160,17 @@ class ChapterDetailState extends State<ChapterDetail> {
     } else {
       for (int i = 0; i < list.length; i++) {
         var item = list[i];
-        if (item['chapterId'] == novel["readChapterId"]) {
+        if (item['chapterId'] == (novel["readChapterId"]??1)) {
           index = i;
           currentTitle = item["title"];
+          currentReadChapterId = item["chapterId"];
         }
         Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
         chapter.globalKey = new GlobalKey();
         titles.add(chapter);
       }
     }
-    Tools.updateUI(this);
+//    Tools.updateUI(this);
   }
 
   @override
@@ -205,7 +197,13 @@ class ChapterDetailState extends State<ChapterDetail> {
                       args.add(novel["name"]);
                       args.add(novel["author"]);
                       args.add(novel["introduction"]);
-                      args.add(Tools.now());
+                      novel["recentReadTime"] = Tools.now();
+                      args.add(novel["recentReadTime"]);
+                      novel["readChapterId"] = currentReadChapterId;
+                      args.add(novel["readChapterId"]);
+                      novel["readPosition"] = offset.toInt();
+                      args.add(novel["readPosition"]);
+                      Global.shelfNovels.add(novel);
                       sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
                       Navigator.of(context).pop(true);
                     },
@@ -324,6 +322,8 @@ class ChapterDetailState extends State<ChapterDetail> {
       ch.title = result["title"];
       sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveChapter,[ch.novelId,ch.chapterId,ch.title,ch.content]);
     }
+    currentTitle = ch.title;
+    currentReadChapterId = ch.chapterId;
     Tools.updateUI(this, fn: fn);
   }
 

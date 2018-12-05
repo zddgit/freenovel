@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/NovelResource.dart';
-import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
 
 typedef onTapFn = void Function(int index, List novels, BuildContext context);
@@ -74,44 +72,6 @@ class Tools {
     state.setState(() {
       if (fn != null) fn();
     });
-  }
-
-  /// 添加到书架
-  static void addToShelf(int index, List showNovels, BuildContext context,{var novel}) {
-    if(novel==null){
-      novel = showNovels[index];
-    }
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('你想加入书架吗？'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('确定'),
-              onPressed: () {
-                SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-                List args = [];
-                args.add(novel["id"]);
-                args.add(novel["name"]);
-                args.add(novel["author"]);
-                args.add(novel["introduction"]);
-                args.add(Tools.now());
-                sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text('取消'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   /// 打开章节详情页
