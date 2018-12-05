@@ -16,8 +16,12 @@ class Global{
   static Map<int,List> map = new Map();
   /// 书库标签对应的刷到第几页了
   static Map<int,int> currentPages = new Map();
-
+  /// 默认字体大小
   static int fontsize = 18;
+  /// 屏幕的高度
+  static double screenHeight;
+  /// 屏幕顶部状态栏的高度
+  static double screenTop;
 
   /// 书架小说列表
   static List shelfNovels=[];

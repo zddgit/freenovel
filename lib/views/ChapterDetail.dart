@@ -33,27 +33,20 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   /// 目录章节标题
   List<Chapter> titles = [];
-
   /// 当前正在读的章节
   ListQueue<Chapter> readChapters;
-
   /// 滚动控制
   ScrollController scrollController;
-  bool hide = true;
   /// 目录看到的索引
   int index = 0;
-
   /// 移动的距离
   double offset=0;
-  /// 屏幕的高度
-  double screenHeight=0;
-  /// 屏幕顶部状态栏的高度
-  double screenTop=0;
+  /// 是否在书架中存在
   bool isExist = false;
   SqfLiteHelper sqfLiteHelper;
-
-  /// 是否加载下一章
+  /// loadMore小部件是否加载下一章
   bool isFinish  = true;
+
   int fontsize = Global.fontsize;
 
   ChapterDetailState(this.novel);
@@ -194,8 +187,7 @@ class ChapterDetailState extends State<ChapterDetail> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery.of(context).size.height;
-    screenTop = MediaQuery.of(context).padding.top;
+
     currentTitle = currentTitle==null?"":currentTitle;
     return WillPopScope(
       onWillPop: (){
@@ -305,7 +297,7 @@ class ChapterDetailState extends State<ChapterDetail> {
       Chapter item = readChapters.elementAt(i);
       if(item.height!=null){
         sum = sum + item.height;
-        if(sum+screenTop>screenHeight+offset){
+        if(sum+Global.screenTop>Global.screenHeight+offset){
           if(i==0){
             currentReadChapterId = item.chapterId;
             title = item.title;
@@ -313,7 +305,7 @@ class ChapterDetailState extends State<ChapterDetail> {
           }else{
             currentReadChapterId = item.chapterId;
             title = item.title;
-            offset = (screenHeight+offset)-(sum+screenTop-item.height);
+            offset = (Global.screenHeight+offset)-(sum+Global.screenTop-item.height);
           }
           break;
         }
