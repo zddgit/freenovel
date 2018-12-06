@@ -1,10 +1,10 @@
 class NovelAPI{
-  static final String baseURI = "http://47.105.67.114:8080/";
+//  static final String baseURI = "http://47.105.67.114:8080/";
 //  static final String baseURI = "Http://192.168.1.194:8080/";
-//  static final String baseURI = "Http://172.18.210.1:8080/";
+  static final String baseURI = "Http://172.18.210.1:8080/";
 
   /// 获取小说目录
-  static String getTitles(int novelId)=>baseURI+"getChapters/$novelId";
+  static String getTitles(int novelId,{int limit =0})=>baseURI+"getChapters/$novelId/$limit";
   /// 获取小说具体章节
   static String getNovelDetail(int novelId,int chapterId)=>baseURI+"getNovelDetail/$novelId/$chapterId";
   /// 获取小说信息

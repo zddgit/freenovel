@@ -9,6 +9,13 @@ class BookSearch extends StatefulWidget {
 
 class BookSearchState extends State<BookSearch> {
   String query;
+  List novels;
+
+  @override
+  void initState() {
+    super.initState();
+    
+  }
 
   @override
   Widget build(BuildContext context) {
