@@ -117,15 +117,16 @@ class ChapterDetailState extends State<ChapterDetail> {
     if(offset==0||currentReadChapterId==null){
       await initOffSetAndReaderchapterId();
     }
-    await getNovel();
-    scrollController.jumpTo(offset);
-    getTitles();
     List list = await sqfLiteHelper.query( NovelSqlHelper.databaseName, NovelSqlHelper.queryNovelByNovelId,[novelId]);
     if(list.length==0){
       isExist = false;
     }else{
       isExist = true;
     }
+    await getNovel();
+    getTitles();
+    Duration duration = new Duration(milliseconds: 100);
+    new Future.delayed(duration,()=>scrollController.jumpTo(offset));
   }
 
   initOffSetAndReaderchapterId() async {
@@ -234,31 +235,46 @@ class ChapterDetailState extends State<ChapterDetail> {
         }
       },
       child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(40.0),
-            child: AppBar(
-            leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed:(){
-                  Navigator.of(context).pop();
-                }),
-            title: Center(child: Text(currentTitle,style: TextStyle(color: Colors.black26,fontSize: 16.0),)),
-            actions: <Widget>[
-              IconButton(icon: Icon(Icons.settings), onPressed:showSetFontSizeSlider)
-            ],
-          ),),
+//          appBar: PreferredSize(
+//            preferredSize: Size.fromHeight(40.0),
+//            child: AppBar(
+//            leading: IconButton(
+//                icon: Icon(Icons.arrow_back),
+//                onPressed:(){
+//                  Navigator.of(context).pop();
+//                }),
+//            title: Center(child: Text(currentTitle,style: TextStyle(color: Colors.black26,fontSize: 16.0),)),
+//            actions: <Widget>[
+//              IconButton(icon: Icon(Icons.settings), onPressed:showSetFontSizeSlider)
+//            ],
+//          ),),
           backgroundColor: Colors.teal[100],
           drawer: TitleDetail(this),
           body: Builder(builder: (BuildContext context) {
-            return LoadMore(
-              isFinish: isFinish,
-              onLoadMore: loadMoreChapter,
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: readChapters == null ? 0 : readChapters.length,
-                itemBuilder: _chapterContentitemBuilder,
-              ),
+            return Column(
+              children: <Widget>[
+                Container(
+                  height: Global.screenTop,
+                  color: Colors.black26,
+                  child: Center(
+                    child: Text(currentTitle),
+                  ),
+                ),
+                Expanded(
+                  child: LoadMore(
+                    isFinish: isFinish,
+                    onLoadMore: loadMoreChapter,
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: readChapters == null ? 0 : readChapters.length,
+                      itemBuilder: _chapterContentitemBuilder,
+                    ),
+                  ),
+                )
+
+              ],
             );
+
           })),
     );
   }
@@ -330,7 +346,9 @@ class ChapterDetailState extends State<ChapterDetail> {
       var result = json.decode(content);
       ch.content = result["content_str"];
       ch.title = result["title"];
-      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveChapter,[ch.novelId,ch.chapterId,ch.title,ch.content]);
+      if(isExist){
+        sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveChapter,[ch.novelId,ch.chapterId,ch.title,ch.content]);
+      }
     }
     currentTitle = ch.title;
     currentReadChapterId = ch.chapterId;

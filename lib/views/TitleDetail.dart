@@ -25,8 +25,22 @@ class TitleDetailState extends State<TitleDetail> {
   void initState() {
     super.initState();
     titleScrollController = ScrollController();
+    titleScrollController.addListener((){
+      if(titles.length!=chapterDetailState.titles.length){
+        titles = chapterDetailState.titles;
+        Tools.updateUI(this,fn:(){ titleScrollController.jumpTo(28.0*(chapterDetailState.index));
+        });
+      }
+    });
     titles = chapterDetailState.titles;
-    titles = titles.sublist(chapterDetailState.index);
+    int i = (chapterDetailState.index-1<0)?0:chapterDetailState.index-1;
+    titles = titles.sublist(i);
+    Duration duration = new Duration(milliseconds: 100);
+    new Future.delayed(duration,(){
+      if(i!=0){
+        titleScrollController.jumpTo(28.0);
+      }
+    });
   }
 
 
@@ -42,22 +56,18 @@ class TitleDetailState extends State<TitleDetail> {
           margin: EdgeInsets.only(top: statusBarHeight, bottom: 10.0),
           child: Column(
             children: <Widget>[
-              Text( "目录", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0), ),
+              Row(children: <Widget>[
+                Expanded(
+                    child: Text( "目录", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0), ),
+                ),
+                IconButton(icon: Icon(Icons.settings), onPressed:chapterDetailState.showSetFontSizeSlider)
+              ],),
               Expanded(
-                child: GestureDetector(
-                  onPanDown: (_){
-                    if(titles.length!=chapterDetailState.titles.length){
-                      titles = chapterDetailState.titles;
-                      Tools.updateUI(this,fn:(){ titleScrollController.jumpTo(28.0*(chapterDetailState.index));
-                      });
-                    }
-                  },
-                  child: ListView.builder(
-                    controller: titleScrollController,
-                    padding: EdgeInsets.only(top: 10.0),
-                    itemCount: titles == null ? 0 : titles.length,
-                    itemBuilder: _chapterTitleItemBuilder),)
-
+                child: ListView.builder(
+                  controller: titleScrollController,
+                  padding: EdgeInsets.only(top: 10.0),
+                  itemCount: titles == null ? 0 : titles.length,
+                  itemBuilder: _chapterTitleItemBuilder)
               )
             ],
           ),

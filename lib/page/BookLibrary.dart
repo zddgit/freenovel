@@ -7,6 +7,7 @@ import 'package:freenovel/page/booksearch.dart';
 import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
+import 'package:loadmore/loadmore_widget.dart';
 
 ///书库
 class BookLibrary extends StatefulWidget {
@@ -21,6 +22,7 @@ class BookLibraryState extends State<BookLibrary>
   String queryName;
   List showNovels = [];
   TabController _controller;
+
   /// 滚动控制
   ScrollController scrollController;
   bool isload = true;
@@ -33,29 +35,25 @@ class BookLibraryState extends State<BookLibrary>
     _controller = TabController(length: Global.tabs.length, vsync: this);
   }
 
-
-
-  getSearchNovels(String name,{page=1}) async {
-    String searchNovels = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name,page));
+  getSearchNovels(String name, {page = 1}) async {
+    String searchNovels =
+        await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(name, page));
     showNovels = json.decode(searchNovels);
-    if(showNovels.length<10){
+    if (showNovels.length < 10) {
       isload = false;
     }
     Tools.updateUI(this);
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: new FloatingActionButton(
-            onPressed: () {
-              Tools.pushPage(context, new BookSearch());
-            },
-            child: new Icon(Icons.search),
-          ),
+          onPressed: () {
+            Tools.pushPage(context, new BookSearch());
+          },
+          child: new Icon(Icons.search),
+        ),
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -70,11 +68,8 @@ class BookLibraryState extends State<BookLibrary>
         body: TabBarView(
           controller: _controller,
           children: Global.pages,
-        )
-    );
+        ));
   }
-
-
 }
 
 class LibraryPage extends StatefulWidget {
@@ -88,10 +83,12 @@ class LibraryPage extends StatefulWidget {
   }
 }
 
-class LibraryPageState extends State<LibraryPage> with AutomaticKeepAliveClientMixin {
+class LibraryPageState extends State<LibraryPage>
+    with AutomaticKeepAliveClientMixin {
   int _tagid;
   int currentPage = 1;
-  bool isload = true;
+
+  bool isFinish = false;
 
   /// 滚动控制
   ScrollController scrollController;
@@ -105,43 +102,36 @@ class LibraryPageState extends State<LibraryPage> with AutomaticKeepAliveClientM
   void initState() {
     super.initState();
     scrollController = ScrollController();
-    if(Global.currentPages[_tagid]==1 && Global.map[_tagid].length==0){
-      loadShowNovels(_tagid,currentPage);
+    if (Global.currentPages[_tagid] == 1 && Global.map[_tagid].length == 0) {
+      loadShowNovels(_tagid, currentPage);
     }
   }
 
-  loadShowNovels(int tagid,int page) async {
-      String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(tagid,page));
-      List result  = json.decode(novels);
-      if(result.length<10){
-        isload = false;
-      }
-      Global.map[_tagid].addAll(result);
-      Global.currentPages[_tagid] = page;
-      Tools.updateUI(this);
+  loadShowNovels(int tagid, int page) async {
+    String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(tagid, page));
+    List result = json.decode(novels);
+    if (result.length ==10) {
+      isFinish = false;
+    }
+    Global.map[_tagid].addAll(result);
+    Global.currentPages[_tagid] = page;
+    Tools.updateUI(this);
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onVerticalDragDown: onVerticalDragDown,
-      child: Tools.listViewBuilder(Global.map[_tagid],controller: scrollController,onTap: Tools.openChapterDetail),
+    return LoadMore(
+      isFinish: isFinish,
+      onLoadMore: loadMoreChapter,
+      child: Tools.listViewBuilder(Global.map[_tagid],
+          controller: scrollController, onTap: Tools.openChapterDetail),
     );
   }
-  onVerticalDragDown(DragDownDetails _) {
-    // 这里指定快划到最后150像素的时候，进行加载
-    double threshold = scrollController.position.maxScrollExtent - scrollController.offset;
-    if (isload && threshold < 100) {
-      currentPage = currentPage+1;
-      loadShowNovels(_tagid,currentPage);
-    } else if(threshold < 10) {
-      Fluttertoast.showToast(
-          msg: "没有更多了",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIos: 2,
-          bgcolor: "#777777",
-          textcolor: '#ffffff');
-    }
+  Future<bool> loadMoreChapter() async{
+    currentPage++;
+    isFinish = true;
+    await loadShowNovels(_tagid, currentPage);
+    await Future.delayed(Duration(milliseconds: 100));
+    return true;
   }
 }
