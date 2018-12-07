@@ -120,11 +120,14 @@ class LibraryPageState extends State<LibraryPage>
 
   @override
   Widget build(BuildContext context) {
-    return LoadMore(
-      isFinish: isFinish,
-      onLoadMore: loadMoreChapter,
-      child: Tools.listViewBuilder(Global.map[_tagid],
-          controller: scrollController, onTap: Tools.openChapterDetail),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: LoadMore(
+        isFinish: isFinish,
+        onLoadMore: loadMoreChapter,
+        child: Tools.listViewBuilder(Global.map[_tagid],
+            controller: scrollController, onTap: Tools.openChapterDetail),
+      ),
     );
   }
   Future<bool> loadMoreChapter() async{

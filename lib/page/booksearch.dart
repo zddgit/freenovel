@@ -1,4 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:freenovel/Global.dart';
+import 'package:freenovel/util/HttpUtil.dart';
+import 'package:freenovel/util/NovelResource.dart';
+import 'package:freenovel/util/Tools.dart';
+import 'package:loadmore/loadmore_widget.dart';
 
 class BookSearch extends StatefulWidget {
   @override
@@ -9,12 +16,18 @@ class BookSearch extends StatefulWidget {
 
 class BookSearchState extends State<BookSearch> {
   String query;
-  List novels;
+
+  List novels=[];
+  ScrollController scrollController = new ScrollController();
+
+  List searchNovels = [];
+  ScrollController searchScrollController = new ScrollController();
+  bool isFinish = false;
+  bool isSearch = false;
 
   @override
   void initState() {
     super.initState();
-    
   }
 
   @override
@@ -33,56 +46,79 @@ class BookSearchState extends State<BookSearch> {
           },
           onSubmitted: (query) {
             print(query);
+            loadSearchNovel();
           },
         ),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
-//                Navigator.of(context).pop();
+                loadSearchNovel();
               })
         ],
       ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.only(left: 16.0, top: 12.0),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    "大家都再搜",
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54),
-                  ),
-                ],
+      body: isSearch?getSearch():getDefault(),
+    );
+  }
+  Widget getDefault(){
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  "大家都再搜",
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+          getRecommend(),
+          getRecommend(),
+          Divider(color: Colors.grey),
+          Container(
+            padding: const EdgeInsets.only(left: 16.0, top: 0.0),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  "热门阅读",
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: LoadMore(
+                isFinish: isFinish,
+                onLoadMore: loadMoreNovel,
+                child: Tools.listViewBuilder(
+                    novels,
+                    controller: scrollController,
+                    onTap: Tools.openChapterDetail),
               ),
             ),
-            getRecommend(),
-            getRecommend(),
-            Divider(color: Colors.grey),
-//            Container(color: Colors.blueGrey[200],height: 4.0,margin: EdgeInsets.only(top: 10.0),),
-            Container(
-              padding: const EdgeInsets.only(left: 16.0, top: 12.0),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    "热门阅读",
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54),
-                  ),
-                ],
-              ),
-            )
+          )
 
-          ],
-        ),
+        ],
       ),
     );
+  }
+  Widget getSearch(){
+    return Tools.listViewBuilder(
+        searchNovels,
+        controller: searchScrollController,
+        onTap: Tools.openChapterDetail);
   }
   Widget getRecommend(){
     List<Widget> list = new List();
@@ -112,7 +148,7 @@ class BookSearchState extends State<BookSearch> {
       }
       list.add(Expanded(
         child: Container(
-          margin: EdgeInsets.only(top: 20.0,left: 10.0,right: 10),
+          margin: EdgeInsets.only(top: 10.0,left: 10.0,right: 10),
           decoration: BoxDecoration(
               border: Border.all(width: 1.0, color: Colors.black38),
               borderRadius: BorderRadius.all(Radius.circular(8.0))),
@@ -130,5 +166,30 @@ class BookSearchState extends State<BookSearch> {
     }
 
     return Row(children: list,);
+  }
+
+  Future<bool> loadMoreNovel() async {
+    await initNovels();
+    await new Future.delayed(new Duration(milliseconds: 100));
+    return true;
+  }
+
+   initNovels() async{
+    String result = await HttpUtil.get(NovelAPI.getRecommentNovelsTop10());
+    List list = json.decode(result);
+    if(list.length<10){
+      isFinish = true;
+    }
+    novels.addAll(list);
+    Tools.updateUI(this);
+  }
+
+  loadSearchNovel() async{
+    isSearch = true;
+    searchNovels.clear();
+    String result = await HttpUtil.get(NovelAPI.getNovelsByNameOrAuthor(query, 1));
+    List list = json.decode(result);
+    searchNovels.addAll(list);
+    Tools.updateUI(this);
   }
 }
