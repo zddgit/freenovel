@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
@@ -156,7 +157,18 @@ class BookSearchState extends State<BookSearch> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(left: 20.0, top: 4.0, bottom: 4.0),
-                child: Text("绝世主神"),
+                child: RaisedButton(
+                  onPressed: (){
+                    Fluttertoast.showToast(
+                        msg: "哈哈，这本书还不能点击",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIos: 1,
+                        bgcolor: "#e74c3c",
+                        textcolor: '#ffffff'
+                    );
+                  },
+                  child: Text("点我"),),
               ),
               recommend
             ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 
@@ -18,9 +19,18 @@ class MySelfState extends State<MySelf> {
       body: Center(child: RaisedButton(
         child: Text("我的"),
         onPressed: (){
-          Global.prefs.remove("database");
-          SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-          sqfLiteHelper.delDataBases("novels");
+//          Global.prefs.remove("database");
+//          SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+//          sqfLiteHelper.delDataBases("novels");
+          Fluttertoast.showToast(
+              msg: "哈哈，这里还没有实现",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIos: 1,
+              bgcolor: "#e74c3c",
+              textcolor: '#ffffff'
+          );
+
         },
       )),
     );
