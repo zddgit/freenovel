@@ -157,8 +157,8 @@ class BookSearchState extends State<BookSearch> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(left: 20.0, top: 4.0, bottom: 4.0),
-                child: RaisedButton(
-                  onPressed: (){
+                child: GestureDetector(
+                  onTap: () {
                     Fluttertoast.showToast(
                         msg: "哈哈，这本书还不能点击",
                         toastLength: Toast.LENGTH_SHORT,
@@ -168,7 +168,7 @@ class BookSearchState extends State<BookSearch> {
                         textcolor: '#ffffff'
                     );
                   },
-                  child: Text("点我"),),
+                  child: Text("点我,点我"),),
               ),
               recommend
             ],

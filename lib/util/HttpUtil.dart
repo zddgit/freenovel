@@ -27,6 +27,10 @@ class HttpUtil {
     }
     return result;
   }
+  static download(String url,String savePath) async{
+    print("download请求：$url");
+    await dio.download(url, savePath);
+  }
 
 }
 void main() async {

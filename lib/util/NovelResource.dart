@@ -1,3 +1,5 @@
+import 'package:freenovel/Global.dart';
+
 class NovelAPI{
   static final String baseURI = "http://47.105.67.114:8080/";
 //  static final String baseURI = "Http://192.168.1.194:8080/";
@@ -19,6 +21,7 @@ class NovelAPI{
   static String getTags()=>baseURI+"getDicByType?type=tag";
   /// 根据类别获取小说
   static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
+
 
 }
 class NovelStatus{

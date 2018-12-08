@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
+//import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
+import 'package:freenovel/views/CoustomCacheImage.dart';
 
 typedef onTapFn = void Function(int index, List novels, BuildContext context);
 typedef onLongPressFn = void Function(
@@ -23,17 +23,18 @@ class Tools {
               decoration: BoxDecoration(
                   border: Border.all(width: 1.0, color: Colors.black38),
                   borderRadius: BorderRadius.all(Radius.circular(2.0))),
-              child: new CachedNetworkImage(
-                imageUrl: NovelAPI.getImage(novel["id"]),
-//                placeholder: new CircularProgressIndicator(),
-                errorWidget: Container(
-                  color: Colors.blueGrey,
-                  child: Center(child: Text(novel["name"].substring(0, 1))),
-                ),
-                width: 50.0,
-                height: 55.0,
-                fit: BoxFit.cover,
-              ),
+              child: CoustomCacheImage(novel["id"]),
+//              new CachedNetworkImage(
+//                imageUrl: NovelAPI.getImage(novel["id"]),
+////                placeholder: new CircularProgressIndicator(),
+//                errorWidget: Container(
+//                  color: Colors.blueGrey,
+//                  child: Center(child: Text(novel["name"].substring(0, 1))),
+//                ),
+//                width: 50.0,
+//                height: 55.0,
+//                fit: BoxFit.cover,
+//              ),
             ),
             title: Text(novel["name"]),
             subtitle: Text(novel["author"]),
@@ -69,9 +70,11 @@ class Tools {
   }
 
   static void updateUI(State state, {fn}) {
-    state.setState(() {
-      if (fn != null) fn();
-    });
+    if(state.mounted){
+      state.setState(() {
+        if (fn != null) fn();
+      });
+    }
   }
 
   /// 打开章节详情页
@@ -96,6 +99,9 @@ class Tools {
                 ),
               );
             }));
+  }
+  static Widget getImg(){
+
   }
 
   static int now(){
