@@ -14,7 +14,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="freenovel"
+        android:label="免费阅读"
         android:icon="@mipmap/icon_logo">
         <activity
             android:name=".MainActivity"
