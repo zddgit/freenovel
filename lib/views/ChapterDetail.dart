@@ -280,6 +280,28 @@ class ChapterDetailState extends State<ChapterDetail> {
   }
 
   Future<bool> loadMoreChapter() async{
+    if(index==titles.length){
+      isFinish = true;
+      String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: titles.length));
+      List list = json.decode(titlesJsonStr);
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < list.length; i++) {
+        var item = list[i];
+        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+        chapter.globalKey = new GlobalKey();
+        titles.add(chapter);
+        sb.write("(");
+        sb.write("${item['novelId']},");
+        sb.write("${item['chapterId']},");
+        sb.write("'${item['title']}'");
+        sb.write("),");
+      }
+      String values = sb.toString();
+      values = values.substring(0, values.length - 1);
+      SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
+      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+    }
     if(index<titles.length){
       index++;
       Chapter ch = titles[index];
@@ -287,6 +309,7 @@ class ChapterDetailState extends State<ChapterDetail> {
       isFinish = true;
       await getNovelDetail(ch);
     }
+
     await Future.delayed(Duration(milliseconds: 100));
     return true;
   }
