@@ -146,30 +146,14 @@ class ChapterDetailState extends State<ChapterDetail> {
   getTitles() async {
     List list = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryChaptersByNovelId, [novelId]);
     if (list == null || list.length == 0) {
-      String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId));
-      list = json.decode(titlesJsonStr);
-      StringBuffer sb = new StringBuffer();
-      for (int i = 0; i < list.length; i++) {
-        var item = list[i];
+      void f(item,index){
         if (item['chapterId'] == (novel["readChapterId"]??1) ) {
-          index = i;
+          this.index = index;
           currentTitle = item["title"];
           currentReadChapterId = item["chapterId"];
         }
-        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
-        chapter.globalKey = new GlobalKey();
-        titles.add(chapter);
-        sb.write("(");
-        sb.write("${item['novelId']},");
-        sb.write("${item['chapterId']},");
-        sb.write("'${item['title']}'");
-        sb.write("),");
       }
-
-      String values = sb.toString();
-      values = values.substring(0, values.length - 1);
-      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
-      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+      await loadTitiles(fn:f);
     } else {
       for (int i = 0; i < list.length; i++) {
         var item = list[i];
@@ -183,7 +167,6 @@ class ChapterDetailState extends State<ChapterDetail> {
         titles.add(chapter);
       }
     }
-//    Tools.updateUI(this);
   }
 
   @override
@@ -271,7 +254,6 @@ class ChapterDetailState extends State<ChapterDetail> {
                     ),
                   ),
                 )
-
               ],
             );
 
@@ -280,27 +262,9 @@ class ChapterDetailState extends State<ChapterDetail> {
   }
 
   Future<bool> loadMoreChapter() async{
-    if(index==titles.length){
+    if(index==(titles.length-1)){
       isFinish = true;
-      String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: titles.length));
-      List list = json.decode(titlesJsonStr);
-      StringBuffer sb = new StringBuffer();
-      for (int i = 0; i < list.length; i++) {
-        var item = list[i];
-        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
-        chapter.globalKey = new GlobalKey();
-        titles.add(chapter);
-        sb.write("(");
-        sb.write("${item['novelId']},");
-        sb.write("${item['chapterId']},");
-        sb.write("'${item['title']}'");
-        sb.write("),");
-      }
-      String values = sb.toString();
-      values = values.substring(0, values.length - 1);
-      SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
-      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+      await loadTitiles();
     }
     if(index<titles.length){
       index++;
@@ -312,6 +276,31 @@ class ChapterDetailState extends State<ChapterDetail> {
 
     await Future.delayed(Duration(milliseconds: 100));
     return true;
+  }
+
+  Future loadTitiles({fn}) async {
+    String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: titles.length));
+    List list = json.decode(titlesJsonStr);
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < list.length; i++) {
+      var item = list[i];
+      if(fn!=null){
+        fn(item,i);
+      }
+      Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+      chapter.globalKey = new GlobalKey();
+      titles.add(chapter);
+      sb.write("(");
+      sb.write("${item['novelId']},");
+      sb.write("${item['chapterId']},");
+      sb.write("'${item['title']}'");
+      sb.write("),");
+    }
+    String values = sb.toString();
+    values = values.substring(0, values.length - 1);
+    SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+    sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
+    sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
   }
 
   /// 滑动检测
