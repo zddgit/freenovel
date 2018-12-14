@@ -10,7 +10,7 @@ import 'package:freenovel/views/ChapterDetail.dart';
 import 'package:loadmore/loadmore_widget.dart';
 
 class TitleDetail extends StatefulWidget {
-  ChapterDetailState chapterDetailState;
+  final ChapterDetailState chapterDetailState;
   TitleDetail(this.chapterDetailState,{Key key}): super(key: key);
 
   @override

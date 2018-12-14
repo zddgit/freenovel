@@ -72,7 +72,7 @@ class BookLibraryState extends State<BookLibrary>
 }
 
 class LibraryPage extends StatefulWidget {
-  int _tagid;
+  final int _tagid;
 
   LibraryPage(this._tagid);
 

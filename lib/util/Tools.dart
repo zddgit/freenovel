@@ -100,10 +100,6 @@ class Tools {
               );
             }));
   }
-  static Widget getImg(){
-
-  }
-
   static int now(){
     return DateTime.now().millisecondsSinceEpoch ~/ 1000;
   }

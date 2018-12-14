@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/home.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 
@@ -64,6 +64,7 @@ class SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+//    showDeviceInfo();
     Global.init(initDataBase);
     //开启倒计时
     timer = Timer.periodic(new Duration(seconds: 1), (_) {
@@ -74,6 +75,10 @@ class SplashPageState extends State<SplashPage> {
       Tools.updateUI(this);
     });
   }
+//  showDeviceInfo() async {
+//    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+//    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+//  }
 
   initDataBase() async {
     String database = Global.prefs.getString("database");

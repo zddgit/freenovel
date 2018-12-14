@@ -3,7 +3,7 @@ import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
 
 class CoustomSlider extends StatefulWidget{
-  State state;
+  final State state;
 
   CoustomSlider(this.state);
 
