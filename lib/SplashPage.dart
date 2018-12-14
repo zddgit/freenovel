@@ -40,7 +40,7 @@ class SplashPageState extends State<SplashPage> {
                       child: FlatButton(
                         onPressed:goToHomePage,
                         color: Colors.black26,
-                        child: Text("$seconds秒|跳过"),
+                        child: Text("$seconds秒跳过"),
                       ),
 
                     )

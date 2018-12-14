@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:freenovel/Global.dart';
-import 'package:freenovel/util/NovelSqlHelper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/page/BookLibrary.dart';
-import 'package:freenovel/page/MySelf.dart';
-import 'package:freenovel/page/Talk.dart';
 import 'package:freenovel/page/Bookshelf.dart';
-import 'package:freenovel/util/SqlfliteHelper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:freenovel/page/MySelf.dart';
+import 'package:freenovel/util/Tools.dart';
 
 /// 首页
 class Home extends StatefulWidget {
+
   @override
   HomeState createState() {
     return HomeState();
@@ -18,7 +16,7 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   int _currentIndex = 0;
-
+  int last = 0;
 
   /// 各类页面
   Widget _changBodyWidget() {
@@ -43,50 +41,71 @@ class HomeState extends State<Home> {
         return null;
     }
   }
+  Future<bool> doubleClickBack() {
+    int now = Tools.now();
+    print(now - last);
+    if (now - last > 3) {
+      last = Tools.now();
+      Fluttertoast.showToast(
+          msg: "再点一次退出阅读器",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 3,
+          backgroundColor:Colors.black,
+          textColor: Colors.white70
+      );
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "FreeNovel",
-      home: Scaffold(
-        body: _changBodyWidget(),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration( border: BorderDirectional(top: BorderSide(color: Colors.grey[300]))),
-          child: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.book),
-                  title: Text("书架"),
-                  activeIcon: Icon(Icons.book),
-                  backgroundColor: Colors.blue),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.list),
-                  title: Text("书库"),
-                  activeIcon: Icon(Icons.list),
-                  backgroundColor: Colors.blue),
+      home: WillPopScope(
+        onWillPop: doubleClickBack,
+        child: Scaffold(
+          body: _changBodyWidget(),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration( border: BorderDirectional(top: BorderSide(color: Colors.grey[300]))),
+            child: BottomNavigationBar(
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.book),
+                    title: Text("书架"),
+                    activeIcon: Icon(Icons.book),
+                    backgroundColor: Colors.blue),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.list),
+                    title: Text("书库"),
+                    activeIcon: Icon(Icons.list),
+                    backgroundColor: Colors.blue),
 //              BottomNavigationBarItem(
 //                  icon: Icon(Icons.find_in_page),
 //                  title: Text("发现"),
 //                  activeIcon: Icon(Icons.find_in_page),
 //                  backgroundColor: Colors.blue),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  title: Text("我的"),
-                  activeIcon: Icon(Icons.account_circle),
-                  backgroundColor: Colors.blue),
-            ],
-            currentIndex: _currentIndex,
-            type: BottomNavigationBarType.fixed,
-            fixedColor: Colors.red,
-            iconSize: 24.0,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    title: Text("我的"),
+                    activeIcon: Icon(Icons.account_circle),
+                    backgroundColor: Colors.blue),
+              ],
+              currentIndex: _currentIndex,
+              type: BottomNavigationBarType.fixed,
+              fixedColor: Colors.red,
+              iconSize: 24.0,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
           ),
-        ),
-      ),
+        ),)
+        ,
     );
   }
 }

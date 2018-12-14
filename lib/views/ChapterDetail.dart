@@ -3,12 +3,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
-import 'package:freenovel/views/CoustomSlider.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
+import 'package:freenovel/views/CoustomSlider.dart';
 import 'package:freenovel/views/TitleDetail.dart';
 import 'package:loadmore/loadmore.dart';
 

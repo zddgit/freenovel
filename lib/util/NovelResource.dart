@@ -1,4 +1,4 @@
-import 'package:freenovel/Global.dart';
+
 
 class NovelAPI{
   static final String baseURI = "http://47.105.67.114:8080/";

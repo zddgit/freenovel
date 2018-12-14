@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:freenovel/Global.dart';
-import 'package:freenovel/util/SqlfliteHelper.dart';
 
 ///我的
 class MySelf extends StatefulWidget {
@@ -27,8 +25,8 @@ class MySelfState extends State<MySelf> {
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIos: 1,
-              bgcolor: "#e74c3c",
-              textcolor: '#ffffff'
+              backgroundColor:Colors.black,
+              textColor: Colors.white70
           );
 
         },

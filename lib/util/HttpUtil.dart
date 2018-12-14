@@ -1,5 +1,6 @@
-import 'package:dio/dio.dart';
 import 'dart:convert';
+
+import 'package:dio/dio.dart';
 
 class HttpUtil {
   static final Dio dio = new Dio();
