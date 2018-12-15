@@ -19,20 +19,9 @@ class NovelAPI{
   static String getNovelsByNameOrAuthor(String keyword,int page)=>baseURI+"getNovelsByNameOrAuthor?keyword=$keyword&page=$page";
   /// 获取小说所有类别
   static String getTags()=>baseURI+"getDicByType?type=tag";
+  static String getSetting()=>baseURI+"getDicByType?type=setting";
   /// 根据类别获取小说
   static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
 
 
-}
-class NovelStatus{
-
-  //书架列表（长字符串如1,2） 小说id集合
-  static String bookshelfPrefsKey = "bookshelf";
-  static String _novelInfo="novelInfo_";
-  static String _readStatus = "readStatus_";
-
-  ///单个小说信息(json结构)
-  static String getReadStatusPrefsKey(int novelId)=>_readStatus+novelId.toString();
-  ///阅读状态(阅读到第几章int)
-  static String getNovelInfoPrefsKey(int novelId)=>_novelInfo+novelId.toString();
 }

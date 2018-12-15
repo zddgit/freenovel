@@ -218,19 +218,6 @@ class ChapterDetailState extends State<ChapterDetail> {
         }
       },
       child: Scaffold(
-//          appBar: PreferredSize(
-//            preferredSize: Size.fromHeight(40.0),
-//            child: AppBar(
-//            leading: IconButton(
-//                icon: Icon(Icons.arrow_back),
-//                onPressed:(){
-//                  Navigator.of(context).pop();
-//                }),
-//            title: Center(child: Text(currentTitle,style: TextStyle(color: Colors.black26,fontSize: 16.0),)),
-//            actions: <Widget>[
-//              IconButton(icon: Icon(Icons.settings), onPressed:showSetFontSizeSlider)
-//            ],
-//          ),),
           backgroundColor: Colors.teal[100],
           drawer: TitleDetail(this),
           body: Builder(builder: (BuildContext context) {
