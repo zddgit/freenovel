@@ -23,5 +23,7 @@ class NovelAPI{
   /// 根据类别获取小说
   static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
 
+  static String loginOrRegister(String type,String account,String pwd)=>baseURI+"loginOrRegister?type=$type&account=$account&pwd=$pwd";
+
 
 }

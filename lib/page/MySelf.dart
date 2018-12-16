@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:freenovel/page/login.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelResource.dart';
 import 'package:freenovel/util/Tools.dart';
@@ -42,7 +43,7 @@ class MySelfState extends State<MySelf> {
               children: <Widget>[
                 FlatButton(
                   onPressed: () {
-
+                    Tools.pushPage(context, Login());
                   },
                   textColor: Colors.white,
                   child: Text("点击登录",style: TextStyle(fontSize: 20.0),),),
@@ -64,8 +65,6 @@ class MySelfState extends State<MySelf> {
               controller: scrollController,
               itemCount: setting.length,
               itemBuilder: _itemBulider),)
-
-
         ],),
       ),
     );
@@ -79,7 +78,7 @@ class MySelfState extends State<MySelf> {
             elevation: 0.0,
             child: ListTile(
                 leading: Text(item["name"]),
-                trailing: item["id"]!=16?IconButton(onPressed:()=>setPage(item["id"]),icon: Icon(Icons.keyboard_arrow_right)):Container(child: Text("1.0"),margin: EdgeInsets.only(right: 12.0),)
+                trailing: item["id"]!=16?IconButton(onPressed:()=>setPage(item),icon: Icon(Icons.keyboard_arrow_right)):Container(child: Text("1.0"),margin: EdgeInsets.only(right: 12.0),)
             ),
           ),
           Divider(color: Colors.grey, height: 1.0,),
@@ -88,12 +87,11 @@ class MySelfState extends State<MySelf> {
 
   Future<void> initSetting() async {
     String sets = await HttpUtil.get(NovelAPI.getSetting());
-    print(sets);
     setting = json.decode(sets);
     Tools.updateUI(this);
   }
 
-  void setPage(id) {
-    print(id);
+  void setPage(item) {
+    print(item);
   }
 }

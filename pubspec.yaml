@@ -25,6 +25,7 @@ dependencies:
   sqflite: ^0.12.2+1
   loadmore: ^1.0.1
   path_provider: ^0.4.1
+  crypto: ^2.0.6
 #  cached_network_image: ^0.5.0
 #  device_info: ^0.3.0
 #  qr_flutter: ^1.1.5
@@ -54,6 +55,10 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
     - images/icon_logo.png
+    - images/QQ.png
+    - images/wx.png
+    - images/wb.png
+    - images/loading.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

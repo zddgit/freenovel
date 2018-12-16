@@ -24,17 +24,6 @@ class Tools {
                   border: Border.all(width: 1.0, color: Colors.black38),
                   borderRadius: BorderRadius.all(Radius.circular(2.0))),
               child: CoustomCacheImage(novel["id"]),
-//              new CachedNetworkImage(
-//                imageUrl: NovelAPI.getImage(novel["id"]),
-////                placeholder: new CircularProgressIndicator(),
-//                errorWidget: Container(
-//                  color: Colors.blueGrey,
-//                  child: Center(child: Text(novel["name"].substring(0, 1))),
-//                ),
-//                width: 50.0,
-//                height: 55.0,
-//                fit: BoxFit.cover,
-//              ),
             ),
             title: Text(novel["name"]),
             subtitle: Text(novel["author"]),
