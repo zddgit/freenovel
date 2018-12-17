@@ -4,7 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/util/HttpUtil.dart';
-import 'package:freenovel/util/NovelResource.dart';
+import 'package:freenovel/util/NovelAPI.dart';
 class Login extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
@@ -98,24 +98,38 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
       );
       return;
     }
-    longin(account,pwd);
+    String type;
+    if(new RegExp('^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+\$').hasMatch(account)){
+      type = "email";
+    }
+    if(new RegExp('^((13[0-9])|(15[^4])|(166)|(17[0-8])|(18[0-9])|(19[8-9])|(147,145))\\d{8}\$').hasMatch(account)){
+      type = "mobile";
+    }
+    if(type==null){
+      Fluttertoast.showToast(
+          msg: "帐号格式填写错误",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 3,
+          backgroundColor:Colors.red,
+          textColor: Colors.white
+      );
+      return;
+    }
+    longin(account,pwd,type);
     showDialog(context: context,builder: (context){
       ctx = context;
       return Image.asset("images/loading.gif");
     });
   }
-  longin(account,pwd) async {
-    String type;
-    if(new RegExp('^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+\$').hasMatch(account)){
-        type = "email";
-    }
-    if(new RegExp('^((13[0-9])|(15[^4])|(166)|(17[0-8])|(18[0-9])|(19[8-9])|(147,145))\\d{8}\$').hasMatch(account)){
-      type = "mobile";
-    }
+  longin(account,pwd,type) async {
     var bytes = utf8.encode(pwd);
     Digest digest = sha1.convert(bytes);
-    String result = await HttpUtil.post(NovelAPI.loginOrRegister(type, account, digest.toString()));
+    String result = await HttpUtil.get(NovelAPI.loginOrRegister(type, account, digest.toString()));
     var r =json.decode(result);
+    if(r["code"]==0){
+      Navigator.of(ctx).pop();
+    }
     Fluttertoast.showToast(
         msg: r["message"],
         toastLength: Toast.LENGTH_SHORT,
@@ -124,7 +138,6 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
         backgroundColor:Colors.black,
         textColor: Colors.white70
     );
-    Navigator.of(ctx).pop();
   }
 
 }

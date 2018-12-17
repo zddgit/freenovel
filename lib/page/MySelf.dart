@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/page/login.dart';
 import 'package:freenovel/util/HttpUtil.dart';
-import 'package:freenovel/util/NovelResource.dart';
+import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
 
 ///我的

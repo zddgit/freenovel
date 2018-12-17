@@ -18,8 +18,8 @@ class NovelAPI{
   /// 搜索小说通过名字或者作者
   static String getNovelsByNameOrAuthor(String keyword,int page)=>baseURI+"getNovelsByNameOrAuthor?keyword=$keyword&page=$page";
   /// 获取小说所有类别
-  static String getTags()=>baseURI+"getDicByType?type=tag";
-  static String getSetting()=>baseURI+"getDicByType?type=setting";
+  static String getTags()=>baseURI+"getDicByType?type=tag&status=0";
+  static String getSetting()=>baseURI+"getDicByType?type=setting&status=0";
   /// 根据类别获取小说
   static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
 

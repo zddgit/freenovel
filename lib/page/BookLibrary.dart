@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/booksearch.dart';
 import 'package:freenovel/util/HttpUtil.dart';
-import 'package:freenovel/util/NovelResource.dart';
+import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
 import 'package:loadmore/loadmore_widget.dart';
 
