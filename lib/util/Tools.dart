@@ -94,4 +94,15 @@ class Tools {
   }
   /// 打开详情
   static void openToDetail(int index, List showNovels, BuildContext context) {}
+
+  static String verifyAccountType(String account){
+    String type;
+    if(new RegExp('^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+\$').hasMatch(account)){
+      type = "email";
+    }
+    if(new RegExp('^((13[0-9])|(15[^4])|(166)|(17[0-8])|(18[0-9])|(19[8-9])|(147,145))\\d{8}\$').hasMatch(account)){
+      type = "mobile";
+    }
+    return type;
+  }
 }

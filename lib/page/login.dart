@@ -3,8 +3,11 @@ import 'package:crypto/crypto.dart';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:freenovel/Global.dart';
+import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
+import 'package:freenovel/util/Tools.dart';
 class Login extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
@@ -98,13 +101,7 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
       );
       return;
     }
-    String type;
-    if(new RegExp('^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+\$').hasMatch(account)){
-      type = "email";
-    }
-    if(new RegExp('^((13[0-9])|(15[^4])|(166)|(17[0-8])|(18[0-9])|(19[8-9])|(147,145))\\d{8}\$').hasMatch(account)){
-      type = "mobile";
-    }
+    String type = Tools.verifyAccountType(account);
     if(type==null){
       Fluttertoast.showToast(
           msg: "帐号格式填写错误",
@@ -116,19 +113,25 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
       );
       return;
     }
-    longin(account,pwd,type);
     showDialog(context: context,builder: (context){
       ctx = context;
       return Image.asset("images/loading.gif");
     });
+    login(account,pwd,type);
   }
-  longin(account,pwd,type) async {
+
+  login(account,pwd,type) async {
     var bytes = utf8.encode(pwd);
     Digest digest = sha1.convert(bytes);
     String result = await HttpUtil.get(NovelAPI.loginOrRegister(type, account, digest.toString()));
     var r =json.decode(result);
     if(r["code"]==0){
+      var user = r["data"];
+      Global.prefs.setString("account",account);
+      Global.prefs.setString("pwd",EncryptUtil.encryptStr(digest.toString(),account));
+      Global.user = user;
       Navigator.of(ctx).pop();
+      Navigator.of(context).pop();
     }
     Fluttertoast.showToast(
         msg: r["message"],

@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:freenovel/page/BookLibrary.dart';
+import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
+import 'package:freenovel/util/Tools.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +29,10 @@ class Global{
 
   /// 书架小说列表
   static List shelfNovels=[];
+  /// 我的
+  static List setting=[];
+  /// 用户信息
+  static Map user;
 
   static SharedPreferences prefs;
 
@@ -40,6 +46,7 @@ class Global{
     /// 首先初始化tabs
     String tags = await HttpUtil.get(NovelAPI.getTags());
     List list = json.decode(tags);
+    autoLogin();
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
       tabs.add(Tab(text: item["name"]));
@@ -56,6 +63,16 @@ class Global{
     List result  = json.decode(novels);
     Global.map[tagid].addAll(result);
     Global.currentPages[tagid] = page;
+  }
+  static void autoLogin() async{
+    String account = prefs.getString("account");
+    if(account!=null){
+      String type = Tools.verifyAccountType(account);
+      String pwd = prefs.getString("pwd");
+      String digest = EncryptUtil.decryptStr(pwd,account);
+      String result = await HttpUtil.get(NovelAPI.loginOrRegister(type, account, digest));
+      user = json.decode(result)["data"];
+    }
   }
 
 
