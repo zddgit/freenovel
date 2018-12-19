@@ -7,6 +7,7 @@ import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,6 +39,8 @@ class Global{
 
   static String cacheImgPath;
 
+  static String version="";
+
   static void init(InitFn fn) async{
     prefs = await SharedPreferences.getInstance();
     Directory tempDir = await getTemporaryDirectory();
@@ -47,6 +50,7 @@ class Global{
     String tags = await HttpUtil.get(NovelAPI.getTags());
     List list = json.decode(tags);
     autoLogin();
+    initVsersion();
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
       tabs.add(Tab(text: item["name"]));
@@ -73,6 +77,10 @@ class Global{
       String result = await HttpUtil.get(NovelAPI.loginOrRegister(type, account, digest));
       user = json.decode(result)["data"];
     }
+  }
+  static void initVsersion() async{
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    version = packageInfo.version;
   }
 
 
