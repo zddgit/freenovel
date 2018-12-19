@@ -49,7 +49,9 @@ class MySelfState extends State<MySelf> {
               children: <Widget>[
                 FlatButton(
                   onPressed: () {
-                    Tools.pushPage(context, Login());
+                    if(Global.user==null){
+                      Tools.pushPage(context, Login());
+                    }
                   },
                   textColor: Colors.white,
                   child: Text(Global.user==null?"点击登录":Global.user["nick"],style: TextStyle(fontSize: 20.0),),),
@@ -259,6 +261,7 @@ class MySelfState extends State<MySelf> {
      }
    }
    signIn() async {
+    // TODO 删除软件，在安装还可以签到。
      if(verifyLogin() && Global.prefs.get("day") != Tools.nowString()){
        int gold = Random().nextInt(300);
        if(gold<50){
