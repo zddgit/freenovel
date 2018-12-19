@@ -24,6 +24,8 @@ class NovelAPI{
   static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
 
   static String loginOrRegister(String type,String account,String pwd)=>baseURI+"loginOrRegister?type=$type&account=$account&pwd=$pwd";
+  /// 签到
+  static String signIn(int id,int goldenBean,String oldgoldbean)=>baseURI+"signIn?id=$id&goldenBean=$goldenBean&oldgoldbean=$oldgoldbean";
 
 
 }

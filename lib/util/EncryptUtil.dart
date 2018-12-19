@@ -2,6 +2,28 @@ import 'dart:convert';
 
 ///  加解密
 class EncryptUtil {
+
+  static int gene = 0xDB6;
+  static String encryptInt(int src){
+    int _src = src ^ gene;
+    print(_src);
+    String _ret = "b";
+    if(_src < 0 ){
+      _src = -_src;
+      _ret = "e";
+    }
+    return _src.toRadixString(16)+_ret;
+  }
+
+  static int decryptInt(String src){
+    String _f =  src.substring(src.length - 1 );
+    int _src = int.parse(src.substring(0,src.length-1),radix: 16);
+    if("e"==_f){
+      _src = -_src;
+    }
+    return _src ^ gene;
+  }
+
   static String encryptStr(String source, String key) {
     List<int> strbyte = utf8.encode(source);
     List<int> keybyte = utf8.encode(key);
@@ -49,6 +71,7 @@ class EncryptUtil {
 }
 
 void main() {
-  print(EncryptUtil.encryptStr("9fe90b293feb641f7f4a8739c6d843d4954dac61", "com"));
-  print(EncryptUtil.decryptStr("DMAJAIDIDPANDRDIDQAJAIANDNDNDOAJDMAJDLAODHDKDQDIAODLAJDJDLDOAJDNDGDMDLALAMAMDNDQ", "com"));
+  print(EncryptUtil.encryptInt(123456));
+  print(EncryptUtil.decryptInt("1eff6b"));
+
 }

@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/login.dart';
+import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
@@ -82,7 +84,7 @@ class MySelfState extends State<MySelf> {
               elevation: 0.0,
               child: GestureDetector(
                 onTap: (){
-                  print(item);
+                  settingOnclick(item);
                 },
                 child: ListTile(
                 leading: Text(item["name"]),
@@ -124,15 +126,20 @@ class MySelfState extends State<MySelf> {
     switch(item["id"]){
         // TODO 获取我的账户
       case 11:
-        return Container(child: Text("300.0 金豆"),margin: EdgeInsets.only(right: 12.0),);
+        int golden=0;
+        if(Global.user!=null){
+          golden = 0;
+          golden = Global.user["goldenBean"];
+        }
+        return Container(child: Text("${golden}.0 金豆"),margin: EdgeInsets.only(right: 12.0),);
         break;
         //签到
       case 12:
-        int info = Random().nextInt(10);
-        if(info>5){
-          return Container(child: Image.asset("images/signIn.png"),margin: EdgeInsets.only(right: 12.0),);
-        }else{
+        String  day  = Global.prefs.getString("day");
+        if(Tools.nowString() == day){
           return Container(child: Image.asset("images/signedIn.png"),margin: EdgeInsets.only(right: 12.0),);
+        }else{
+          return Container(child: Image.asset("images/signIn.png"),margin: EdgeInsets.only(right: 12.0),);
         }
         break;
         // TODO 我的私信
@@ -170,4 +177,61 @@ class MySelfState extends State<MySelf> {
     }
 
   }
+
+  void settingOnclick(item) {
+
+    switch (item["id"]){
+      // 签到
+      case 12:
+        signIn();
+        break;
+      default:
+        break;
+    }
+  }
+   verifyLogin(){
+     if(Global.user==null){
+       Fluttertoast.showToast(
+           msg: "你还未登录",
+           toastLength: Toast.LENGTH_SHORT,
+           gravity: ToastGravity.CENTER,
+           timeInSecForIos: 3,
+           backgroundColor:Colors.red,
+           textColor: Colors.white70
+       );
+       return;
+     }
+   }
+   signIn() async {
+     verifyLogin();
+     int gold = Random().nextInt(300);
+     if(gold<50){
+       gold = 50;
+     }
+     String msg = await HttpUtil.get(NovelAPI.signIn(Global.user["id"], Global.user["goldenBean"]+gold, EncryptUtil.encryptInt(Global.user["goldenBean"])));
+     var map = json.decode(msg);
+     if(map["code"]==0){
+       Fluttertoast.showToast(
+           msg: "你获得${gold}金豆",
+           toastLength: Toast.LENGTH_SHORT,
+           gravity: ToastGravity.CENTER,
+           timeInSecForIos: 3,
+           backgroundColor:Colors.black54,
+           textColor: Colors.white70
+       );
+       Global.user["goldenBean"] = Global.user["goldenBean"]+gold;
+       Global.prefs.setString("day",Tools.nowString());
+       Tools.updateUI(this);
+     }else{
+       Fluttertoast.showToast(
+           msg: map["message"],
+           toastLength: Toast.LENGTH_SHORT,
+           gravity: ToastGravity.CENTER,
+           timeInSecForIos: 3,
+           backgroundColor:Colors.red,
+           textColor: Colors.white70
+       );
+     }
+
+   }
 }
