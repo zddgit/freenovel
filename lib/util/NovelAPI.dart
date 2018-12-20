@@ -25,7 +25,9 @@ class NovelAPI{
 
   static String loginOrRegister(String type,String account,String pwd)=>baseURI+"loginOrRegister?type=$type&account=$account&pwd=$pwd";
   /// 签到
-  static String signIn(int id,int goldenBean,String oldgoldbean)=>baseURI+"signIn?id=$id&goldenBean=$goldenBean&oldgoldbean=$oldgoldbean";
+  static String signIn(int id,int goldenBean,String verify)=>baseURI+"signIn?id=$id&goldenBean=$goldenBean&verify=$verify";
+  /// 获取私信
+  static String getMessages(String verify,int userid)=>baseURI+"getMessages?userid=$userid&verify=$verify";
 
 
 }

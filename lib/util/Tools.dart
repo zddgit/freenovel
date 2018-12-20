@@ -94,7 +94,7 @@ class Tools {
   }
   static String nowString(){
     DateTime dt = DateTime.now();
-    return "${dt.year}.${dt.month}.${dt.day}";
+    return "${dt.year}-${dt.month}-${dt.day}";
   }
   /// 打开详情
   static void openToDetail(int index, List showNovels, BuildContext context) {}
