@@ -30,6 +30,8 @@ class NovelAPI{
   static String getMessages(String verify,int userid)=>baseURI+"getMessages?userid=$userid&verify=$verify";
   /// 标记已读
   static String markRead(int messageId,String verify)=>baseURI+"markRead?messageId=$messageId&verify=$verify";
+  /// 建议反馈
+  static String feedback(String feedback,String userId,String verify)=>baseURI+"feedback?feedback=$feedback&userId=$userId&verify=$verify";
 
 
 }

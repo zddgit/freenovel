@@ -22,6 +22,7 @@ class MySelf extends StatefulWidget {
 class MySelfState extends State<MySelf> {
   List setting = [];
   ScrollController scrollController = ScrollController();
+  TextEditingController textEditingController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -359,6 +360,7 @@ class MySelfState extends State<MySelf> {
                       padding: const EdgeInsets.all(8.0),
                       child: Center(
                         child: TextField(
+                          controller: textEditingController,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               hintText: "留言建议"),
@@ -367,7 +369,9 @@ class MySelfState extends State<MySelf> {
                       ),
                     ),
                     FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        commitFeedback(ctx);
+                      },
                       child: Container(
                         child: Center(
                             child: Text(
@@ -385,6 +389,25 @@ class MySelfState extends State<MySelf> {
           });
     }
   }
+
+  void commitFeedback(ctx) async {
+    String feedback = textEditingController.text;
+    String userid = Global.user["id"].toString();
+    String result = await HttpUtil.get(NovelAPI.feedback(feedback, userid, EncryptUtil.encryptStr(userid)));
+    var r = json.decode(result);
+    if(r["code"]==0){
+      textEditingController.text = "";
+      Navigator.of(ctx).pop();
+    }
+    Fluttertoast.showToast(
+        msg: r["message"],
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 3,
+        backgroundColor: Colors.black,
+        textColor: Colors.white70);
+  }
+
 
 
 }
