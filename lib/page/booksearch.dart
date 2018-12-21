@@ -25,10 +25,7 @@ class BookSearchState extends State<BookSearch> {
   bool isFinish = false;
   bool isSearch = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +54,11 @@ class BookSearchState extends State<BookSearch> {
               })
         ],
       ),
-      body: isSearch?getSearch():getDefault(),
+      body: isSearch?getSearch():getDefaultNew(),
     );
+  }
+  Widget getDefaultNew(){
+    return Container(child: Center(child: Text("还未开始搜索"),),);
   }
   Widget getDefault(){
     return Container(
@@ -115,10 +115,14 @@ class BookSearchState extends State<BookSearch> {
     );
   }
   Widget getSearch(){
-    return Tools.listViewBuilder(
-        searchNovels,
-        controller: searchScrollController,
-        onTap: Tools.openChapterDetail);
+    if(searchNovels.length==0){
+      return Container(child: Center(child: Text("无搜索结果,请修改关键字"),),);
+    }else{
+      return Tools.listViewBuilder(
+          searchNovels,
+          controller: searchScrollController,
+          onTap: Tools.openChapterDetail);
+    }
   }
   Widget getRecommend(){
     List<Widget> list = new List();
