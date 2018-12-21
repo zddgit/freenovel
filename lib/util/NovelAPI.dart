@@ -28,6 +28,8 @@ class NovelAPI{
   static String signIn(int id,int goldenBean,String verify)=>baseURI+"signIn?id=$id&goldenBean=$goldenBean&verify=$verify";
   /// 获取私信
   static String getMessages(String verify,int userid)=>baseURI+"getMessages?userid=$userid&verify=$verify";
+  /// 标记已读
+  static String markRead(int messageId,String verify)=>baseURI+"markRead?messageId=$messageId&verify=$verify";
 
 
 }

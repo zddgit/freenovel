@@ -73,7 +73,7 @@ class Global{
     if(account!=null){
       String type = Tools.verifyAccountType(account);
       String pwd = prefs.getString("pwd");
-      String digest = EncryptUtil.decryptStr(pwd,account);
+      String digest = EncryptUtil.decryptStr(pwd);
       String result = await HttpUtil.get(NovelAPI.loginOrRegister(type, account, digest));
       user = json.decode(result)["data"];
     }

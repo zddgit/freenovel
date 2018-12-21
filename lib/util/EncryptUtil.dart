@@ -2,7 +2,7 @@ import 'dart:convert';
 
 ///  加解密
 class EncryptUtil {
-
+  static  String key = "freeNovel@zdd";
   static int gene = 0xDB6;
   static String encryptInt(int src){
     int _src = src ^ gene;
@@ -24,12 +24,12 @@ class EncryptUtil {
     return _src ^ gene;
   }
 
-  static String encryptStr(String source, String key) {
+  static String encryptStr(String source) {
     List<int> strbyte = utf8.encode(source);
     List<int> keybyte = utf8.encode(key);
     List<int> bt = [0, 0];
     String retstr = "";
-    for (int i = 0, j = 0; i < strbyte.length; i++, j++) {
+    for (int i = 0, j = 0; i < strbyte.length; i++) {
       int ret = strbyte[i] ^ keybyte[j];
       bt[0] = (65 + (ret / 26).floor());
       bt[1] = (65 + ret % 26);
@@ -37,12 +37,14 @@ class EncryptUtil {
       retstr += s;
       if (j == keybyte.length - 1) {
         j = 0;
+      }else{
+        j++;
       }
     }
     return retstr;
   }
 
-  static String decryptStr(String source, String key) {
+  static String decryptStr(String source) {
     List<int> strbyte = utf8.encode(source);
     List<int> keybyte = utf8.encode(key);
     String mstr = "";
@@ -58,12 +60,14 @@ class EncryptUtil {
 
     strbyte = utf8.encode(mstr);
     String retstr = "";
-    for (int i = 0, j = 0; i < strbyte.length; i++, j++) {
+    for (int i = 0, j = 0; i < strbyte.length; i++) {
       retbt[0] = strbyte[i] ^ keybyte[j];
       String s = utf8.decode(retbt);
       retstr += s;
       if (j == keybyte.length - 1) {
         j = 0;
+      }else{
+        j++;
       }
     }
     return retstr;

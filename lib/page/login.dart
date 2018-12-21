@@ -128,7 +128,7 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
     if(r["code"]==0){
       var user = r["data"];
       Global.prefs.setString("account",account);
-      Global.prefs.setString("pwd",EncryptUtil.encryptStr(digest.toString(),account));
+      Global.prefs.setString("pwd",EncryptUtil.encryptStr(digest.toString()));
       Global.user = user;
       Navigator.of(ctx).pop();
       Navigator.of(context).pop();

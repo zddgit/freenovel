@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:freenovel/Global.dart';
@@ -37,7 +36,10 @@ class MessageState extends State<Messages>{
         child:ExpansionPanelList(
           expansionCallback: (panelIndex,isExpanded){
             if(!isExpanded){
-              messages[panelIndex]["read"]=1;
+              if(messages[panelIndex]["read"]!=1){
+                messages[panelIndex]["read"]=1;
+                HttpUtil.get(NovelAPI.markRead(messages[panelIndex]["id"], EncryptUtil.encryptStr(messages[panelIndex]["id"].toString())));
+              }
               Global.user["messages"] = null;
             }
             currentPanelIndex=(currentPanelIndex!=panelIndex?panelIndex:-1);
@@ -76,7 +78,7 @@ class MessageState extends State<Messages>{
 
   void initMessages() async{
     int userid = Global.user["id"];
-    String result = await HttpUtil.get(NovelAPI.getMessages(EncryptUtil.encryptStr(userid.toString(), userid.toString()), userid));
+    String result = await HttpUtil.get(NovelAPI.getMessages(EncryptUtil.encryptStr(userid.toString()), userid));
     var map = json.decode(result);
     messages = map["data"];
     Tools.updateUI(this);
