@@ -66,11 +66,11 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
           ),
           FlatButton(child: Text("登录/注册",style: TextStyle(color: Colors.white),),color: Colors.blue,onPressed: showLogin,)
         ],),),
-        Row(children: <Widget>[
-          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wx.png"), onPressed: ()=>openWx(),),height: 30.0,),flex: 1,),
-          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wb.png"), onPressed: ()=>openWb(),),height: 30.0,),flex: 1,),
-          Expanded(child: Container(child: FlatButton(child: Image.asset("images/QQ.png"), onPressed: ()=>openQQ(),),height: 30.0,),flex: 1,),
-        ],),
+//        Row(children: <Widget>[
+//          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wx.png"), onPressed: ()=>openWx(),),height: 30.0,),flex: 1,),
+//          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wb.png"), onPressed: ()=>openWb(),),height: 30.0,),flex: 1,),
+//          Expanded(child: Container(child: FlatButton(child: Image.asset("images/QQ.png"), onPressed: ()=>openQQ(),),height: 30.0,),flex: 1,),
+//        ],),
         Padding(
           padding: const EdgeInsets.only(top: 8.0,bottom: 15.0),
           child: Text("点击登录代表同意此软件的 使用协议 和 隐私政策",style: TextStyle(color: Colors.grey,fontSize: 12.0),),
