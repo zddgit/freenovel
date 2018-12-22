@@ -10,6 +10,9 @@ import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+
 
 ///我的
 class MySelf extends StatefulWidget {
@@ -23,6 +26,15 @@ class MySelfState extends State<MySelf> {
   List setting = [];
   ScrollController scrollController = ScrollController();
   TextEditingController textEditingController = new TextEditingController();
+  List<String> goldens = [
+    "心意到了就好~谢谢你们~",
+    "最喜欢你一言不合就打赏的样子了~~~",
+    "请简单粗暴地爱我。",
+    "大爷，赏个铜板呗",
+    "万物皆有时，比如你我相遇",
+    "听说，打赏我的人最后都找到了真爱。",
+    "打赏了的人都会变美~",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +86,7 @@ class MySelfState extends State<MySelf> {
                           color: Colors.white70,
                           borderRadius: BorderRadius.circular(30.0)),
                       height: 60.0,
-                      child: Image.asset(Global.user == null
-                          ? "images/offline.png"
-                          : "images/online.png"),
+                      child: Image.asset(Global.user == null ? "images/offline.png":"images/online.png"),
                     ),
                   )
                 ],
@@ -247,6 +257,10 @@ class MySelfState extends State<MySelf> {
         //留言建议
         feedback();
         break;
+      case 17:
+      //留言建议
+        pay();
+        break;
       default:
         break;
     }
@@ -305,7 +319,7 @@ class MySelfState extends State<MySelf> {
       });
     }
   }
-
+  /// 使用协议
   void useAgreement() {
     showDialog(
       context: context,
@@ -407,7 +421,42 @@ class MySelfState extends State<MySelf> {
         backgroundColor: Colors.black,
         textColor: Colors.white70);
   }
-
-
-
+  /// 赞赏
+  void pay() async {
+    showDialog(
+        context: context,
+        builder:(ctx){
+           return AlertDialog(
+             title: Text(goldens[Random().nextInt(goldens.length)]),
+             actions: <Widget>[
+               FlatButton(
+                 onPressed: (){
+                   alipay();
+                 },
+                 child: Text("支付宝赞赏"),
+               ),
+               FlatButton(
+                 onPressed: (){
+                    Navigator.of(ctx).pop();
+                 },
+                 child: Text("残忍拒绝"),
+               ),
+             ],
+           );
+    } );
+  }
+  void alipay() async {
+    const url = 'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx02895wuahrfsry5wylab';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      Fluttertoast.showToast(
+          msg: "5555,你的系统不支持跳转",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white70);
+    }
+  }
 }
