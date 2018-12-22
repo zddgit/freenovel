@@ -130,7 +130,7 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
       Global.prefs.setString("account",account);
       Global.prefs.setString("pwd",EncryptUtil.encryptStr(digest.toString()));
       Global.user = user;
-      Navigator.of(ctx).pop();
+      // 弹出登陆页面
       Navigator.of(context).pop();
     }
     Fluttertoast.showToast(
@@ -141,6 +141,8 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
         backgroundColor:Colors.black,
         textColor: Colors.white70
     );
+    //弹出加载页面
+    Navigator.of(ctx).pop();
   }
 
 }
