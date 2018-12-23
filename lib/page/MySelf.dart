@@ -451,7 +451,7 @@ class MySelfState extends State<MySelf> {
       await launch(url);
     } else {
       Fluttertoast.showToast(
-          msg: "5555,你的系统不支持跳转",
+          msg: "5555,您的手机无法唤醒支付宝",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIos: 3,
