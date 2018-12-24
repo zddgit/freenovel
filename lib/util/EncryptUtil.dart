@@ -1,24 +1,29 @@
 import 'dart:convert';
 
+import 'dart:math';
+
 ///  加解密
 class EncryptUtil {
   static  String key = "freeNovel@zdd";
   static int gene = 0xDB6;
   static String encryptInt(int src){
     int _src = src ^ gene;
-    print(_src);
-    String _ret = "b";
+    String _ret;
     if(_src < 0 ){
       _src = -_src;
-      _ret = "e";
+      _ret = "0";
+    }else{
+      _ret = String.fromCharCode(97 + Random().nextInt(25));
     }
+    _src = _src+_ret.codeUnits.first;
     return _src.toRadixString(16)+_ret;
   }
 
   static int decryptInt(String src){
     String _f =  src.substring(src.length - 1 );
     int _src = int.parse(src.substring(0,src.length-1),radix: 16);
-    if("e"==_f){
+    _src = _src-_f.codeUnits.first;
+    if("0"==_f){
       _src = -_src;
     }
     return _src ^ gene;
@@ -73,4 +78,9 @@ class EncryptUtil {
     return retstr;
   }
 }
+  void main(){
+    print(EncryptUtil.encryptInt(100000));
+    print(EncryptUtil.decryptInt("18b80c"));
+  }
+
 

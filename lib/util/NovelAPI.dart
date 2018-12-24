@@ -1,4 +1,4 @@
-
+import 'package:freenovel/util/EncryptUtil.dart';
 
 class NovelAPI{
   static final String baseURI = "http://47.105.67.114:8080/";
@@ -6,13 +6,24 @@ class NovelAPI{
 //  static final String baseURI = "Http://172.18.210.1:8080/";
 
   /// 获取小说目录
-  static String getTitles(int novelId,{int limit =0})=>baseURI+"getChapters/$novelId/$limit";
+  static String getTitles(int novelId,{int limit =0}){
+    String nid= EncryptUtil.encryptInt(novelId);
+    return baseURI+"getChapters/$nid/$limit";
+  }
   /// 获取小说具体章节
-  static String getNovelDetail(int novelId,int chapterId)=>baseURI+"getNovelDetail/$novelId/$chapterId";
+  static String getNovelDetail(int novelId,int chapterId){
+    String nid= EncryptUtil.encryptInt(novelId);
+    String cid= EncryptUtil.encryptInt(chapterId);
+    return baseURI+"getNovelDetail/$nid/$cid";
+  }
+
   /// 获取小说信息
   static String getNovel(int novelId)=>baseURI+"getNovel/$novelId";
   /// 获取小说封面
-  static String getImage(int novelId)=>baseURI+"getImage/$novelId.jpg";
+  static String getImage(int novelId){
+    String nid= EncryptUtil.encryptInt(novelId);
+    return baseURI+"getImage/$nid.jpg";
+  }
   /// 推荐小说列表top10
   static String getRecommentNovelsTop10()=>baseURI+"getRecommentNovelsTop10";
   /// 搜索小说通过名字或者作者

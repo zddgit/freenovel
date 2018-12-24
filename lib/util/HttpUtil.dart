@@ -34,8 +34,4 @@ class HttpUtil {
   }
 
 }
-void main() async {
-  var str = await HttpUtil.get("http://192.168.1.194:8080/getChapters/1");
-  print(str);
 
-}

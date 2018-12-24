@@ -37,12 +37,11 @@ class BookSearchState extends State<BookSearch> {
               Navigator.of(context).pop();
             }),
         title: TextField(
-          decoration: InputDecoration(hintText: "输入书名、作者或者关键词"),
+          decoration: InputDecoration(hintText: "输入书名、作者关键词"),
           onChanged: (query) {
             this.query = query;
           },
           onSubmitted: (query) {
-            print(query);
             loadSearchNovel();
           },
         ),
@@ -116,7 +115,7 @@ class BookSearchState extends State<BookSearch> {
   }
   Widget getSearch(){
     if(searchNovels.length==0){
-      return Container(child: Center(child: Text("无搜索结果,请修改关键字"),),);
+      return Container(child: Center(child: Text("无搜索结果,请修改关键字或者到我的->反馈，按照\n#书名_作者#\n格式反馈给开发者，会尽快上线你喜欢的小说"),),);
     }else{
       return Tools.listViewBuilder(
           searchNovels,

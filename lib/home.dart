@@ -43,7 +43,6 @@ class HomeState extends State<Home> {
   }
   Future<bool> doubleClickBack() {
     int now = Tools.now();
-    print(now - last);
     if (now - last > 3) {
       last = Tools.now();
       Fluttertoast.showToast(
