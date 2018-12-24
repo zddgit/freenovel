@@ -74,8 +74,3 @@ class EncryptUtil {
   }
 }
 
-void main() {
-  print(EncryptUtil.encryptInt(123456));
-  print(EncryptUtil.decryptInt("1eff6b"));
-
-}

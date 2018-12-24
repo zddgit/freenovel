@@ -66,11 +66,11 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
           ),
           FlatButton(child: Text("登录/注册",style: TextStyle(color: Colors.white),),color: Colors.blue,onPressed: showLogin,)
         ],),),
-        Row(children: <Widget>[
-          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wx.png"), onPressed: ()=>openWx(),),height: 30.0,),flex: 1,),
-          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wb.png"), onPressed: ()=>openWb(),),height: 30.0,),flex: 1,),
-          Expanded(child: Container(child: FlatButton(child: Image.asset("images/QQ.png"), onPressed: ()=>openQQ(),),height: 30.0,),flex: 1,),
-        ],),
+//        Row(children: <Widget>[
+//          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wx.png"), onPressed: ()=>openWx(),),height: 30.0,),flex: 1,),
+//          Expanded(child: Container(child: FlatButton(child: Image.asset("images/wb.png"), onPressed: ()=>openWb(),),height: 30.0,),flex: 1,),
+//          Expanded(child: Container(child: FlatButton(child: Image.asset("images/QQ.png"), onPressed: ()=>openQQ(),),height: 30.0,),flex: 1,),
+//        ],),
         Padding(
           padding: const EdgeInsets.only(top: 8.0,bottom: 15.0),
           child: Text("点击登录代表同意此软件的 使用协议 和 隐私政策",style: TextStyle(color: Colors.grey,fontSize: 12.0),),
@@ -130,7 +130,7 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
       Global.prefs.setString("account",account);
       Global.prefs.setString("pwd",EncryptUtil.encryptStr(digest.toString()));
       Global.user = user;
-      Navigator.of(ctx).pop();
+      // 弹出登陆页面
       Navigator.of(context).pop();
     }
     Fluttertoast.showToast(
@@ -141,6 +141,8 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
         backgroundColor:Colors.black,
         textColor: Colors.white70
     );
+    //弹出加载页面
+    Navigator.of(ctx).pop();
   }
 
 }
