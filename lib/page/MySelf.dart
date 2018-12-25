@@ -387,11 +387,7 @@ class MySelfState extends State<MySelf> {
                         commitFeedback(ctx);
                       },
                       child: Container(
-                        child: Center(
-                            child: Text(
-                              "建议留言提交",
-                              style: TextStyle(color: Colors.white),
-                            )),
+                        child: Center( child: Text( "建议留言提交", style: TextStyle(color: Colors.white), )),
                         width: 100,
                       ),
                       color: Colors.blue,
@@ -425,12 +421,14 @@ class MySelfState extends State<MySelf> {
   void pay() async {
     showDialog(
         context: context,
+        barrierDismissible: false,
         builder:(ctx){
            return AlertDialog(
              title: Text(goldens[Random().nextInt(goldens.length)]),
              actions: <Widget>[
                FlatButton(
                  onPressed: (){
+                   Navigator.of(ctx).pop();
                    alipay();
                  },
                  child: Text("支付宝赞赏"),
@@ -446,7 +444,7 @@ class MySelfState extends State<MySelf> {
     } );
   }
   void alipay() async {
-    const url = 'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx02895wuahrfsry5wylab';
+    const url = 'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/00c010171xcmdi0b3frupb9';
     if (await canLaunch(url)) {
       await launch(url);
     } else {

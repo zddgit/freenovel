@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/page/Bookshelf.dart';
 import 'package:freenovel/page/MySelf.dart';
+import 'package:freenovel/util/HttpUtil.dart';
+import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// 首页
 class Home extends StatefulWidget {
@@ -17,6 +23,12 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   int _currentIndex = 0;
   int last = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    checkVersion();
+  }
 
   /// 各类页面
   Widget _changBodyWidget() {
@@ -106,5 +118,45 @@ class HomeState extends State<Home> {
         ),)
         ,
     );
+  }
+
+  void checkVersion() async{
+    String  version = await HttpUtil.get(NovelAPI.checkVersion());
+    version = version.substring(1,version.length-1);
+    if(version!=Global.version){
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx){
+        return AlertDialog(title: Text("检测到有新版本需要更新"),actions: <Widget>[
+          FlatButton(onPressed:(){
+            autoUpdate();
+            Navigator.of(ctx).pop();
+          }, child:Text("更新")),
+          FlatButton(onPressed: (){
+            Timer.periodic(Duration(seconds: 10), (thiz){
+              checkVersion();
+              thiz.cancel();
+            });
+            Navigator.of(ctx).pop();
+          }, child:Text("稍后提醒")),
+        ],);
+      });
+    }
+  }
+
+  void autoUpdate() async{
+    var url = NovelAPI.autoUpdate();
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      Fluttertoast.showToast(
+          msg: "无法启动浏览器下载",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white70);
+    }
   }
 }

@@ -44,5 +44,8 @@ class NovelAPI{
   /// 建议反馈
   static String feedback(String feedback,String userId,String verify)=>baseURI+"feedback?feedback=$feedback&userId=$userId&verify=$verify";
 
+  static String checkVersion()=>baseURI+"getVersion";
+  static String autoUpdate()=>baseURI+"autoUpdate";
+
 
 }

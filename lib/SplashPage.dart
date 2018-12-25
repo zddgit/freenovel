@@ -64,7 +64,6 @@ class SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-//    showDeviceInfo();
     Global.init(initDataBase);
     //开启倒计时
     timer = Timer.periodic(new Duration(seconds: 1), (_) {
@@ -75,10 +74,7 @@ class SplashPageState extends State<SplashPage> {
       Tools.updateUI(this);
     });
   }
-//  showDeviceInfo() async {
-//    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-//    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-//  }
+
 
   initDataBase() async {
     String database = Global.prefs.getString("database");
@@ -97,12 +93,6 @@ class SplashPageState extends State<SplashPage> {
       Global.fontsize = fontsize;
     }
   }
-
-//  void countDown() {
-//    //设置倒计时三秒后执行跳转方法
-//    var duration = new Duration(seconds: 5);
-//    new Future.delayed(duration, goToHomePage);
-//  }
 
   void goToHomePage() {
     timer.cancel();
