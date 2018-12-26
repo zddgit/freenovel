@@ -28,15 +28,16 @@ class SplashPageState extends State<SplashPage> {
     return new Scaffold(
       body: Column(
         children: <Widget>[
+          Expanded(flex: 1,child: Container(),),
           Expanded(
-            flex: 2,
+            flex: 7,
             child: Row(
               children: <Widget>[
                 Expanded(
                   child: Stack(children: <Widget>[
                     Center(child: Image.asset("images/icon_logo.png"),),
                     Padding(
-                      padding: EdgeInsets.only(left: left, top: 60.0),
+                      padding: EdgeInsets.only(left: left),
                       child: FlatButton(
                         onPressed:goToHomePage,
                         color: Colors.black26,
@@ -50,7 +51,7 @@ class SplashPageState extends State<SplashPage> {
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 6,
             child: Text(
               "免费阅读",
               style: TextStyle(fontSize: 40.0,fontWeight: FontWeight.w100,color: Colors.blue),
