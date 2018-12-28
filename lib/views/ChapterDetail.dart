@@ -98,7 +98,7 @@ class ChapterDetailState extends State<ChapterDetail> {
     if(isExist){
       saveNovel();
     }
-
+    scrollController.dispose();
   }
   /// 退出保存信息
   void saveNovel(){
@@ -283,11 +283,13 @@ class ChapterDetailState extends State<ChapterDetail> {
       sb.write("'${item['title']}'");
       sb.write("),");
     }
-    String values = sb.toString();
-    values = values.substring(0, values.length - 1);
     SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
-    sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+    if(isExist){
+      String values = sb.toString();
+      values = values.substring(0, values.length - 1);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
+      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+    }
   }
 
   /// 滑动检测

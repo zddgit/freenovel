@@ -58,8 +58,8 @@ class TitleDetailState extends State<TitleDetail> {
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top; //状态栏的高度
     return Container(
+        width: 250,
         color: Colors.grey,
-        width: 200.0,
         child: Container(
           margin: EdgeInsets.only(top: statusBarHeight, bottom: 10.0),
           child: Column(
@@ -105,8 +105,8 @@ class TitleDetailState extends State<TitleDetail> {
       child: Container(
           height: 20.0,
           decoration: BoxDecoration( border: Border(bottom: BorderSide(color: Colors.blueGrey))),
-          child: FlatButton(
-              onPressed: () {
+          child: GestureDetector(
+              onTap: () {
                 chapterDetailState.index = index;
                 chapterDetailState.readChapters.clear();
                 chapterDetailState.readChapters.addFirst(chapter);
@@ -130,7 +130,6 @@ class TitleDetailState extends State<TitleDetail> {
       var item = list[i];
       Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
       chapter.globalKey = new GlobalKey();
-      titles.add(chapter);
       chapterDetailState.titles.add(chapter);
       sb.write("(");
       sb.write("${item['novelId']},");
@@ -139,12 +138,13 @@ class TitleDetailState extends State<TitleDetail> {
       sb.write("),");
     }
     Tools.updateUI(this);
-    String values = sb.toString();
-    values = values.substring(0, values.length - 1);
     SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
-    sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
-    sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
-
+    if(chapterDetailState.isExist){
+      String values = sb.toString();
+      values = values.substring(0, values.length - 1);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
+      sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.updateUpdateTimeByNovelId, [Tools.now(), novelId]);
+    }
   }
 
 }
