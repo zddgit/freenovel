@@ -73,6 +73,7 @@ class Tools {
   }
 
   static void pushPage(BuildContext context,var page){
+    //带有渐隐渐入效果的，从右到左的效果的动画
     Navigator.of(context).push(
         new PageRouteBuilder(
             pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) { return page;},
