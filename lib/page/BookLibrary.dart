@@ -6,7 +6,7 @@ import 'package:freenovel/page/booksearch.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
-import 'package:loadmore/loadmore_widget.dart';
+import 'package:loadmore/loadmore.dart';
 
 ///书库
 class BookLibrary extends StatefulWidget {
