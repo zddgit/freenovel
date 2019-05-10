@@ -83,5 +83,61 @@ class Global{
     version = packageInfo.version;
   }
 
+  static List<String> initPage(double width,double height,int padding,int fontSize,String data){
+    List<String> pages = new List<String>();
+    int lineWordCount = ((width-padding)/fontSize).floor();
+    List<String> details = data.split("。");
+    StringBuffer content = new StringBuffer();
+    int total = (height*4/(fontSize*6)).floor();
+    int pageLines = 0;
+    for(int i = 0;i<details.length;i++){
+      String raw = details.elementAt(i).trim();
+      String item="";
+      if(raw!=""){
+        raw = raw + "。";
+      }
+      if(raw.isNotEmpty){
+        item ="\n        "+raw;
+      }
+      int lines = ((raw.length+2)/lineWordCount).ceil();
+      pageLines = pageLines+lines;
+      if(pageLines>total){
+        int sub = (total-(pageLines-lines))*lineWordCount-2;
+        if(sub != -2){
+          String line = raw.substring(0,sub>raw.length?raw.length:sub);
+          content.write("\n        "+line);
+          String page = content.toString();
+          if(page.startsWith("\n")){
+            page = page.substring(2);
+          }
+          pages.add(page);
+          content = new StringBuffer();
+          if (!line.endsWith("。")){
+            item = raw.replaceAll(line, "");
+            lines = (item.length/lineWordCount).ceil();
+            content.write(item);
+          }
+        }else{
+          String page = content.toString();
+          if(page.startsWith("\n")){
+            page = page.substring(2);
+          }
+          pages.add(page);
+          content = new StringBuffer();
+          content.write(item);
+        }
+        pageLines = lines;
+      }else{
+        content.write(item);
+      }
+    }
+    String page = content.toString();
+    if(page.startsWith("\n")){
+      page = page.substring(2);
+    }
+    pages.add(page);
+    return pages;
+  }
+
 
 }
