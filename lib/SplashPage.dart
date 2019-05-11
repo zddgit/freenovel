@@ -23,8 +23,10 @@ class SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     Global.screenHeight = MediaQuery.of(context).size.height;
+    Global.screenWidth = MediaQuery.of(context).size.width;
     Global.screenTop = MediaQuery.of(context).padding.top;
     double left = MediaQuery.of(context).size.width * 0.65;
+    Global.pageType = 2;
     return new Scaffold(
       body: Column(
         children: <Widget>[

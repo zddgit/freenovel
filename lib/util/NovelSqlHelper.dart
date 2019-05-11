@@ -8,7 +8,7 @@ class NovelSqlHelper{
   static String delChapterByNovelId = "delete from chapter where novelId = ?";
 
 
-  static String saveNovel = "insert into novel (id,name,author,introduction,recentReadTime,readChapterId,readPosition) values (?,?,?,?,?,?,?)";
+  static String saveNovel = "replace into novel (id,name,author,introduction,recentReadTime,readChapterId,readPosition) values (?,?,?,?,?,?,?)";
   static String saveChapter = "replace into chapter (novelId,chapterId,title,content) values (?,?,?,?)";
   static String batchSaveChapter = "replace into chapter (novelId,chapterId,title) values ";
 

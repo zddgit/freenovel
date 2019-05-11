@@ -12,7 +12,7 @@ import 'package:freenovel/views/CoustomSlider.dart';
 import 'package:freenovel/views/TitleDetail.dart';
 import 'package:loadmore/loadmore.dart';
 
-/// 文章主体页面
+/// 垂直滑动翻页文章主体页面
 class ChapterDetail extends StatefulWidget {
   final Map novel;
 

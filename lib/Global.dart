@@ -27,6 +27,10 @@ class Global{
   static double screenHeight;
   /// 屏幕顶部状态栏的高度
   static double screenTop;
+  /// 屏幕的宽度
+  static double screenWidth;
+  /// 翻页方式 1：上下 2：左右
+  static int pageType = 1;
 
   /// 书架小说列表
   static List shelfNovels=[];
@@ -40,6 +44,7 @@ class Global{
   static String cacheImgPath;
 
   static String version="";
+
 
   static void init(InitFn fn) async{
     prefs = await SharedPreferences.getInstance();

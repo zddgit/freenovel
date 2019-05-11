@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/booksearch.dart';
 import 'package:freenovel/util/HttpUtil.dart';
@@ -29,6 +30,7 @@ class BookLibraryState extends State<BookLibrary>
   @override
   void initState() {
     super.initState();
+
     queryName = "";
     scrollController = ScrollController();
     _controller = TabController(length: Global.tabs.length, vsync: this);

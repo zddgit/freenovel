@@ -1,6 +1,8 @@
 //import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:freenovel/Global.dart';
 import 'package:freenovel/views/ChapterDetail.dart';
+import 'package:freenovel/views/ChapterDetailPageImp.dart';
 import 'package:freenovel/views/CoustomCacheImage.dart';
 
 typedef onTapFn = void Function(int index, List novels, BuildContext context);
@@ -69,7 +71,12 @@ class Tools {
   /// 打开章节详情页
   static void openChapterDetail(int index,List novels,BuildContext context) {
     var novel = novels[index];
-    pushPage(context, new ChapterDetail(novel));
+    if (Global.pageType == 2){
+      pushPage(context, new ChapterDetailPageImp(novel));
+    }else{
+      pushPage(context, new ChapterDetail(novel));
+    }
+
   }
 
   static void pushPage(BuildContext context,var page){
@@ -110,6 +117,13 @@ class Tools {
     }
     return type;
   }
-
+  static loadingPage(BuildContext context){
+    BuildContext ctx;
+    showDialog(context: context,builder: (context){
+      ctx = context;
+      return Image.asset("images/loading.gif");
+    });
+    return ctx;
+  }
 
 }
