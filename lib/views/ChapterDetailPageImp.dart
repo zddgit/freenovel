@@ -89,6 +89,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       Global.shelfNovels.forEach((item){
         if(novelId == item["id"]){
           isExist = true;
+          item["readPosition"]= page;
         }
       });
       if(!isExist){//这里代表书架不存在要保存书架
@@ -245,7 +246,18 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       info["title"] = title;
     }
     info["length"] = pages.length;
-    if(type==0){//初始化加还原初始值
+    if(type==0){//初始化
+      totalPages.addAll(pages);
+      // 向前多加载一章
+      if(chapterId>1 && page==0){
+        loadeChapter(novelId, chapterId-1, -1);
+      }
+      //向后多加载一章
+      if(page==(totalPages.length-1)){
+        loadeChapter(novelId, chapterId+1, 1);
+      }
+    }
+    if(type==2){//目录页面打开的
       totalPages = [];
       page = 0;
       currentIndex = 0;
@@ -258,8 +270,8 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       }
     }
     if(type==-1){//加载上一章，头插
+      currentIndex = page+pages.length;
       totalPages.insertAll(0, pages);
-      currentIndex = pages.length;
     }
     if(type==1){//加载下一张，尾插
       currentIndex = totalPages.length-1;
@@ -274,8 +286,10 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
     var keys = chapterIdAndTitlePages.keys;
     int length = 0;
     bool flag = false;
-    for(int i=0;i<keys.length;i++){
-        var key = keys.toList()[i];
+    List klist = keys.toList();
+    klist.sort();
+    for(int i=0;i<klist.length;i++){
+        var key = klist[i];
         length = length + chapterIdAndTitlePages[key]["length"];
         if(length > currentIndex){
           map["currentChapterId"] = key;

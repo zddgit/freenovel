@@ -61,7 +61,7 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
                 onTap: (){
                   Navigator.of(context).pop();//弹出目录页
                   Navigator.of(context).pop();//弹出模态页
-                  chapterDetailPageImpState.loadeChapter(chapter.novelId, chapter.chapterId, 0);
+                  chapterDetailPageImpState.loadeChapter(chapter.novelId, chapter.chapterId, 2);
               }),
             height: 50,
           );
