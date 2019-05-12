@@ -6,7 +6,7 @@ import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
-import 'package:freenovel/views/ChapterDetail.dart';
+import 'package:freenovel/views/oldpage/ChapterDetail.dart';
 import 'package:loadmore/loadmore.dart';
 
 class TitleDetail extends StatefulWidget {

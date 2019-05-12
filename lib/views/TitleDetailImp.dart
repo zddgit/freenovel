@@ -6,7 +6,7 @@ import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 
-import 'ChapterDetail.dart';
+
 import 'ChapterDetailPageImp.dart';
 
 class TitleDetailImp extends StatefulWidget {
@@ -82,5 +82,24 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
     Tools.updateUI(this);
 
   }
+
+}
+/// 章节内容
+class Chapter {
+  /// 章节id
+  final int chapterId;
+  /// 小说id
+  final int novelId;
+  /// 章节标题
+  String title;
+  /// 章节内容
+  String content;
+  Chapter(this.chapterId, this.novelId, this.title, {this.content = ""});
+  @override
+  String toString() {
+    String contentStr = content.substring(0,10);
+    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, content: $contentStr}';
+  }
+
 
 }

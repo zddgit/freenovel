@@ -8,8 +8,8 @@ import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
-import 'package:freenovel/views/CoustomSlider.dart';
-import 'package:freenovel/views/TitleDetail.dart';
+import 'package:freenovel/views/oldpage/CoustomSlider.dart';
+import 'package:freenovel/views/oldpage/TitleDetail.dart';
 import 'package:loadmore/loadmore.dart';
 
 /// 垂直滑动翻页文章主体页面

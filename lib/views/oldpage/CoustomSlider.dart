@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freenovel/util/Tools.dart';
-import 'package:freenovel/views/ChapterDetail.dart';
+import 'package:freenovel/views/oldpage/ChapterDetail.dart';
 
 class CoustomSlider extends StatefulWidget{
   final State state;
