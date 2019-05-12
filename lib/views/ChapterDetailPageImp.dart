@@ -11,6 +11,8 @@ import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 
+import 'TitleDetailImp.dart';
+
 
 // 左右滑动翻页
 class ChapterDetailPageImp extends StatefulWidget{
@@ -27,13 +29,12 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   final Map novel;
   int novelId;
   int currentReadChapterId = 1;
-//  String title="";
   /// 当前章节第几页
   int page=0;
   /// 是否在书架中存在
   bool isExist = false;
   /// 总的页面内容
-  List<String> totalPages = [];
+  List<String> totalPages=[];
   /// 当前看到第几页
   int currentIndex=0;
   /// 每一章占有多少页,标题
@@ -41,10 +42,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
  
   /// 页面内容
   List<String> pages = [];
-  /// 页面字体大小
-  int fontSize = 20;
-  /// 页面左右两边总间距
-  int padding = 20;
+
   
 
 
@@ -111,51 +109,82 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       );
     }
     //当章节加载出来以后，使用下面的组件
-    return WillPopScope(
-      onWillPop:(){
-        if(!isExist){
-          return showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('你想加入书架吗？'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('确定'),
-                    onPressed: () {
-                      isExist = true;
-                      Navigator.of(context).pop(true);
-                    },
-                  ),
-                  FlatButton(
-                    child: Text('取消'),
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }else{
-          return Future.value(true);
-        }
-      },
-      child: new Scaffold(
-        backgroundColor: Colors.teal[100],
-        body: new Swiper(
+    return Scaffold(
+      backgroundColor: Global.bgColor,
+      body: WillPopScope(
+        onWillPop:(){
+          if(!isExist){
+            return showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('你想加入书架吗？'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('确定'),
+                      onPressed: () {
+                        isExist = true;
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text('取消'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }else{
+            return Future.value(true);
+          }
+        },
+        child: new Swiper(
           key: new GlobalKey(),// new一个key，保证每一次build生成的都是新的小组件
           index: currentIndex,
           loop: false,
+          onTap: (index){
+            showModalBottomSheet(context: context,builder: (BuildContext context) {
+              return Container(
+                height: 100,
+                child: BottomNavigationBar(
+                  onTap: (index) {
+                    if(index==0) titleSetting();
+                    if(index==1) themeSetting();
+                    if(index == 2) fontSizeSetting();
+                  },
+                  items: <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.list),
+                        title: Text("目录"),
+                        activeIcon: Icon(Icons.list),
+                    ),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.wb_sunny),
+                        title: Text("日间"),
+                        activeIcon: Icon(Icons.brightness_2),
+                    ),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.text_format),
+                        title: Text("设置"),
+                        activeIcon: Icon(Icons.text_format),
+                        backgroundColor: Colors.blue),
+                  ],),
+              );
+            });
+          },
           itemBuilder: (BuildContext context, int index) {
-            Widget txt = Text( totalPages[index], style: TextStyle(fontSize: 20, height: 1.1),);
+            Widget txt = Text( totalPages[index], style: TextStyle(fontSize: Global.fontSize, height: 1.1,color: Global.fontColor),);
             return Container(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: EdgeInsets.fromLTRB(10, 8, 10, 0),
               child: Column(
                 children: <Widget>[
                   Container(
-                    child: Text(info["title"] + ":" + index.toString()),
+                    child: Text(info["title"]),
+                    height: Global.top,
                   ),
                   Expanded(child: txt,),
                 ],
@@ -178,7 +207,9 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
             }
             if(index==0){
               // 加载上一章
-              loadeChapter(novelId,currentReadChapterId-1,-1);
+              if((currentReadChapterId-1)>0){
+                loadeChapter(novelId,currentReadChapterId-1,-1);
+              }
             }
           },
         ),
@@ -191,7 +222,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
     List chapterDetail = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChapterByChapterIdAndNovel,[novelId,chapterId]);
     if (chapterDetail.length==1 && chapterDetail.elementAt(0)["content"] !=null){
       /// 说明手机数据库有数据
-      pages = Global.initPage(Global.screenWidth, Global.screenHeight, padding, fontSize, chapterDetail.elementAt(0)["content"]);
+      pages = Global.initPage(Global.screenWidth, Global.screenHeight-Global.top, Global.padding, Global.fontSize, chapterDetail.elementAt(0)["content"]);
       info["title"] = chapterDetail.elementAt(0)["title"];
     }else{
       /// 手机数据库没有数据,从网络获取
@@ -203,13 +234,21 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       if(isExist){
         sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveChapter,[novelId,chapterId,title,content]);
       }
-      pages = Global.initPage(Global.screenWidth, Global.screenHeight, padding, fontSize, content);
+      pages = Global.initPage(Global.screenWidth, Global.screenHeight, Global.padding, Global.fontSize, content);
       info["title"] = title;
     }
     info["length"] = pages.length;
-    chapterIdAndTitlePages[chapterId] = info;
-    if(type==0){//初始化
+    if(type==0){//初始化加还原初始值
+      totalPages = [];
+      page = 0;
+      currentIndex = 0;
+      currentReadChapterId = chapterId;
+      chapterIdAndTitlePages= new HashMap();
       totalPages.addAll(pages);
+      // 向前多加载一章
+      if(chapterId>1){
+        loadeChapter(novelId, chapterId-1, -1);
+      }
     }
     if(type==-1){//加载上一章，头插
       totalPages.insertAll(0, pages);
@@ -219,6 +258,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       currentIndex = totalPages.length-1;
       totalPages.addAll(pages);
     }
+    chapterIdAndTitlePages[chapterId] = info;
     Tools.updateUI(this);
   }
   /// 计算当前处于那个章节
@@ -242,6 +282,39 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
         flag = true;
     }
     return map;
+  }
+  /// 字体设置
+  void fontSizeSetting() {
+    showModalBottomSheet(context: context,builder: (BuildContext context){
+      return Container(
+        child: Row(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: FlatButton(child: Text("Aa-",style: TextStyle(color: Colors.white),),onPressed: (){
+                Global.switchFontSize(this,-1);
+              },color: Colors.blue,),
+            ),
+            Expanded(child: Center(child: Text("字体大小设置"),),flex: 1,),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: FlatButton(child: Text("Aa+",style: TextStyle(color: Colors.white),),onPressed: (){
+                Global.switchFontSize(this,1);
+              },color: Colors.blue,),
+            )
+          ],
+        ),
+        height: 100,
+      );
+    });
+  }
+  /// 阅读页面主题设置
+  void themeSetting() {
+    Global.switchTheme(this);
+  }
+  /// 目录页面跳转
+  void titleSetting() {
+      Tools.pushPage(context,TitleDetailImp(this.novelId,this.currentReadChapterId,this));
   }
 
 

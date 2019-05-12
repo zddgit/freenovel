@@ -93,7 +93,7 @@ class SplashPageState extends State<SplashPage> {
     }
     int fontsize = Global.prefs.getInt("fontsize");
     if(fontsize!=null){
-      Global.fontsize = fontsize;
+      Global.fontSize = fontsize.toDouble();
     }
   }
 

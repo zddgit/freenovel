@@ -29,7 +29,7 @@ class CoustomSliderState extends State<CoustomSlider>{
         fontsize = value.toInt();
         Tools.updateUI(this);
         if(state is ChapterDetailState){
-          (state as ChapterDetailState).fontsize = fontsize;
+          (state as ChapterDetailState).fontsize = fontsize.toDouble();
           (state as ChapterDetailState).updateFontSize();
         }
       },

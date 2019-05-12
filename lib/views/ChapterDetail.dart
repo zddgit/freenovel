@@ -47,13 +47,13 @@ class ChapterDetailState extends State<ChapterDetail> {
   /// loadMore小部件是否加载下一章
   bool isFinish  = true;
 
-  int fontsize = Global.fontsize;
+  double fontsize = Global.fontSize;
 
   ChapterDetailState(this.novel);
 
   updateFontSize(){
-    Global.fontsize = fontsize;
-    Global.prefs.setInt("fontsize", fontsize);
+    Global.fontSize = fontsize;
+    Global.prefs.setDouble("fontsize", fontsize);
     Tools.updateUI(this);
   }
 
@@ -399,8 +399,7 @@ class Chapter {
 
   @override
   String toString() {
-    String contentStr = content.substring(0,10);
-    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, content: $contentStr, globalKey: $globalKey, height: $height}';
+    return 'Chapter{chapterId: $chapterId, novelId: $novelId, title: $title, content: $content, globalKey: $globalKey, height: $height}';
   }
 
 

@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+
 import 'package:flutter/material.dart';
 import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/Tools.dart';
+import 'package:freenovel/views/ChapterDetailPageImp.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,8 +23,7 @@ class Global{
   static Map<int,List> map = new Map();
   /// 书库标签对应的刷到第几页了
   static Map<int,int> currentPages = new Map();
-  /// 默认字体大小
-  static int fontsize = 18;
+
   /// 屏幕的高度
   static double screenHeight;
   /// 屏幕顶部状态栏的高度
@@ -45,7 +46,37 @@ class Global{
 
   static String version="";
 
+  /// 页面字体大小
+  static double fontSize = 20;
+  /// 页面左右两边总间距
+  static double padding = 20;
+  /// 页面顶部标题盖度
+  static double top = 24;
+  /// 阅读页面背景色
+  static Color bgColor = Colors.teal[100];
+  /// 阅读页面字体颜色
+  static Color fontColor = Colors.black;
 
+ static void switchTheme(State state){
+   if(fontColor==Colors.black){
+     fontColor = Colors.blueGrey;
+     bgColor = Colors.black87;
+   }else{
+     fontColor = Colors.black;
+     bgColor =  Colors.teal[100];
+   }
+   Tools.updateUI(state);
+ }
+  static void switchFontSize(ChapterDetailPageImpState state,int size){
+    fontSize = fontSize + size;
+    // 上一次处于那一章的头
+    if(state.page==0){
+      state.currentIndex = state.page;
+    }else{
+      state.currentIndex = state.page-size.abs();
+    }
+    state.loadeChapter(state.novelId, state.currentReadChapterId, 0);
+  }
   static void init(InitFn fn) async{
     prefs = await SharedPreferences.getInstance();
     Directory tempDir = await getTemporaryDirectory();
@@ -88,12 +119,12 @@ class Global{
     version = packageInfo.version;
   }
 
-  static List<String> initPage(double width,double height,int padding,int fontSize,String data){
+  static List<String> initPage(double width,double height,double padding,double fontSize,String data){
     List<String> pages = new List<String>();
     int lineWordCount = ((width-padding)/fontSize).floor();
     List<String> details = data.split("。");
     StringBuffer content = new StringBuffer();
-    int total = (height*4/(fontSize*6)).floor();
+    int total = (height*4/(fontSize*6)).floor()-1;
     int pageLines = 0;
     for(int i = 0;i<details.length;i++){
       String raw = details.elementAt(i).trim();

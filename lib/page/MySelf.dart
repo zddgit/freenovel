@@ -258,7 +258,7 @@ class MySelfState extends State<MySelf> {
         feedback();
         break;
       case 17:
-      //留言建议
+      //支付
         pay();
         break;
       default:
