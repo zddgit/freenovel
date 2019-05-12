@@ -151,12 +151,19 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
               return Container(
                 height: 100,
                 child: BottomNavigationBar(
+                  type: BottomNavigationBarType.fixed,
                   onTap: (index) {
-                    if(index==0) titleSetting();
-                    if(index==1) themeSetting();
-                    if(index == 2) fontSizeSetting();
+                    if(index == 0) back();
+                    if(index==1) titleSetting();
+                    if(index==2) themeSetting();
+                    if(index ==3) fontSizeSetting();
                   },
                   items: <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.arrow_back),
+                      title: Text("返回"),
+                      activeIcon: Icon(Icons.arrow_back),
+                    ),
                     BottomNavigationBarItem(
                         icon: Icon(Icons.list),
                         title: Text("目录"),
@@ -171,7 +178,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
                         icon: Icon(Icons.text_format),
                         title: Text("设置"),
                         activeIcon: Icon(Icons.text_format),
-                        backgroundColor: Colors.blue),
+                        ),
                   ],),
               );
             });
@@ -315,6 +322,11 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   /// 目录页面跳转
   void titleSetting() {
       Tools.pushPage(context,TitleDetailImp(this.novelId,this.currentReadChapterId,this));
+  }
+  /// 退出详情页
+  void back() {
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
 

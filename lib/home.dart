@@ -93,16 +93,16 @@ class HomeState extends State<Home> {
                     title: Text("书库"),
                     activeIcon: Icon(Icons.list),
                     backgroundColor: Colors.blue),
-//              BottomNavigationBarItem(
-//                  icon: Icon(Icons.find_in_page),
-//                  title: Text("发现"),
-//                  activeIcon: Icon(Icons.find_in_page),
-//                  backgroundColor: Colors.blue),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.person),
                     title: Text("我的"),
                     activeIcon: Icon(Icons.account_circle),
                     backgroundColor: Colors.blue),
+//                BottomNavigationBarItem(
+//                  icon: Icon(Icons.find_in_page),
+//                  title: Text("发现"),
+//                  activeIcon: Icon(Icons.find_in_page),
+//                  backgroundColor: Colors.blue),
               ],
               currentIndex: _currentIndex,
               type: BottomNavigationBarType.fixed,
