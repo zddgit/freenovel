@@ -1,9 +1,6 @@
-//import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:freenovel/Global.dart';
-import 'package:freenovel/views/ChapterDetail.dart';
 import 'package:freenovel/views/ChapterDetailPageImp.dart';
-import 'package:freenovel/views/CoustomCacheImage.dart';
+import 'package:freenovel/views/oldpage/CoustomCacheImage.dart';
 
 typedef onTapFn = void Function(int index, List novels, BuildContext context);
 typedef onLongPressFn = void Function(
@@ -71,12 +68,7 @@ class Tools {
   /// 打开章节详情页
   static void openChapterDetail(int index,List novels,BuildContext context) {
     var novel = novels[index];
-    if (Global.pageType == 2){
-      pushPage(context, new ChapterDetailPageImp(novel));
-    }else{
-      pushPage(context, new ChapterDetail(novel));
-    }
-
+    pushPage(context, new ChapterDetailPageImp(novel));
   }
 
   static void pushPage(BuildContext context,var page){
