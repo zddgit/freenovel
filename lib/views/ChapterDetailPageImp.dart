@@ -132,6 +132,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
                     FlatButton(
                       child: Text('取消'),
                       onPressed: () {
+                        sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.delChapterByNovelId,[novelId]);
                         Navigator.of(context).pop(true);
                       },
                     ),

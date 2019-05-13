@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 
@@ -71,12 +72,34 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
   }
 
   void getTitle() async{
-    String titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: titles.length));
+    List dbList = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryChaptersByNovelId, [novelId]);
+    String titlesJsonStr;
+    if(dbList!=null && dbList.length!=0 && dbList[dbList.length-1]['chapterId']==dbList.length){//这个判断就是章节在数据库是连续的，不是断断续续的
+      for (int i = 0; i < dbList.length; i++) {
+        var item = dbList[i];
+        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+        titles.add(chapter);
+      }
+      titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: dbList.length));
+    }else{
+      titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: 0));
+    }
+    StringBuffer sb = new StringBuffer();
     List list = json.decode(titlesJsonStr);
-    for (int i = 0; i < list.length; i++) {
-      var item = list[i];
-      Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
-      titles.add(chapter);
+    if(list!=null && list.length>0){
+      for (int i = 0; i < list.length; i++) {
+        var item = list[i];
+        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+        titles.add(chapter);
+        sb.write("(");
+        sb.write("${item['novelId']},");
+        sb.write("${item['chapterId']},");
+        sb.write("'${item['title']}'");
+        sb.write("),");
+      }
+      String values = sb.toString();
+      values = values.substring(0, values.length - 1);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
     }
     scrollController.jumpTo((chapterId-1)*50.toDouble());
     Tools.updateUI(this);
