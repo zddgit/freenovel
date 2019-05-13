@@ -340,8 +340,38 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   }
   /// 退出详情页
   void back() {
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
+    Navigator.of(context).pop();//弹出模态页
+    if(!isExist){
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text('你想加入书架吗？'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('确定'),
+                onPressed: () {
+                  isExist = true;
+                  Navigator.of(ctx).pop(); //弹出AlertDialog
+                  Navigator.of(context).pop(); //弹出详情页
+                },
+              ),
+              FlatButton(
+                child: Text('取消'),
+                onPressed: () {
+                  sqfLiteHelper.update(NovelSqlHelper.databaseName, NovelSqlHelper.delChapterByNovelId,[novelId]);
+                  Navigator.of(ctx).pop(); //弹出AlertDialog
+                  Navigator.of(context).pop(); //弹出详情页
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }else{
+      Navigator.of(context).pop(); //弹出详情页
+    }
   }
 
 

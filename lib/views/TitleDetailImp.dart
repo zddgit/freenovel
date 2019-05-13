@@ -41,6 +41,35 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
 
   @override
   Widget build(BuildContext context) {
+    Widget body;
+    if(titles.length==0){
+      body =  ListView(
+        controller: scrollController,
+        children: <Widget>[
+          Center(child: Image.asset("images/loading.gif"))
+      ],);
+    }else{
+      body = ListView.builder(
+        controller: scrollController,
+        itemBuilder: (BuildContext ctx, int index) {
+          Chapter chapter = titles[index];
+          return Container(
+            decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey[300]))),
+            child: GestureDetector(
+                child: Padding(padding: EdgeInsets.fromLTRB(8, 15, 0, 10),
+                  child: Text(chapter.title, overflow: TextOverflow.ellipsis),),
+                onTap: () {
+                  Navigator.of(context).pop(); //弹出目录页
+                  Navigator.of(context).pop(); //弹出模态页
+                  chapterDetailPageImpState.loadeChapter(
+                      chapter.novelId, chapter.chapterId, 2);
+                }),
+            height: 50,
+          );
+        },
+        itemCount: titles.length,);
+    }
     return new Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -51,23 +80,7 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
             }),
         title: Text("目录"),
       ),
-      body: ListView.builder(
-        controller: scrollController,
-        itemBuilder: (BuildContext ctx, int index){
-          Chapter chapter = titles[index];
-          return Container(
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[300]))),
-            child: GestureDetector(
-                child:Padding(padding: EdgeInsets.fromLTRB(8, 15, 0, 10),child: Text(chapter.title,overflow: TextOverflow.ellipsis),),
-                onTap: (){
-                  Navigator.of(context).pop();//弹出目录页
-                  Navigator.of(context).pop();//弹出模态页
-                  chapterDetailPageImpState.loadeChapter(chapter.novelId, chapter.chapterId, 2);
-              }),
-            height: 50,
-          );
-        },
-        itemCount: titles.length,),
+      body: body,
     );
   }
 
@@ -103,6 +116,7 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
     }
     scrollController.jumpTo((chapterId-1)*50.toDouble());
     Tools.updateUI(this);
+
 
   }
 
