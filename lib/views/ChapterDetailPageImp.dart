@@ -43,6 +43,9 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   /// 页面内容
   List<String> pages = [];
 
+  /// 加载中的上下文引用
+  BuildContext loadingCtx;
+
   
 
 
@@ -203,21 +206,25 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
           itemCount: totalPages.length,
           onIndexChanged: (index){
             currentIndex = index;
+            // 实时计算当前所处于那页
             Map info = computeCurrentReadChapterIdAndPage();
             int currentChapterId =info["currentChapterId"];
             page = info["page"];
+            // 获取正确的当前章节以后修改全局变量
             if(currentReadChapterId != currentChapterId){
               currentReadChapterId = currentChapterId;
               Tools.updateUI(this);
             }
             if(index==(totalPages.length-1)){
+              showLoading();
               // 加载下一章
-              loadeChapter(novelId,currentReadChapterId+1,1);
+              loadeChapter(novelId,currentReadChapterId+1,1,fn:cancleLoading);
             }
             if(index==0){
               // 加载上一章
               if((currentReadChapterId-1)>0){
-                loadeChapter(novelId,currentReadChapterId-1,-1);
+                showLoading();
+                loadeChapter(novelId,currentReadChapterId-1,-1,fn:cancleLoading);
               }
             }
           },
@@ -226,7 +233,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
     );
   }
 // 加载章节内容
-  void loadeChapter(int novelId, int chapterId,int type) async {
+  void loadeChapter(int novelId, int chapterId,int type,{fn}) async {
     Map info = new HashMap();
     List chapterDetail = await sqfLiteHelper.query(NovelSqlHelper.databaseName, NovelSqlHelper.queryChapterByChapterIdAndNovel,[novelId,chapterId]);
     if (chapterDetail.length==1 && chapterDetail.elementAt(0)["content"] !=null){
@@ -279,6 +286,9 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       totalPages.addAll(pages);
     }
     chapterIdAndTitlePages[chapterId] = info;
+    if(fn != null){
+      fn();
+    }
     Tools.updateUI(this);
   }
   /// 计算当前处于那个章节
@@ -373,6 +383,17 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       Navigator.of(context).pop(); //弹出详情页
     }
   }
+  /// 显示加载中。。。
+  void showLoading() {
+    showDialog(context: context,builder: (context){
+      loadingCtx = context;
+      return Image.asset("images/loading.gif");
+    });
+  }
+  /// 取消加载中...
+ void cancleLoading(){
+    Navigator.of(loadingCtx).pop();
+ }
 
 
 
