@@ -393,6 +393,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   /// 取消加载中...
  void cancleLoading(){
     Navigator.of(loadingCtx).pop();
+    loadingCtx = null;
  }
 
 
