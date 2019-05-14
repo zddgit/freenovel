@@ -10,6 +10,8 @@ import 'package:freenovel/util/NovelAPI.dart';
 import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+
 
 import 'TitleDetailImp.dart';
 
@@ -189,13 +191,13 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
             });
           },
           itemBuilder: (BuildContext context, int index) {
-            Widget txt = Text( totalPages[index], style: TextStyle(fontSize: Global.fontSize, height: 1.1,color: Global.fontColor),);
+            Widget txt = AutoSizeText( totalPages[index], style: TextStyle(fontSize: Global.fontSize, height: 1.1,color: Global.fontColor),);
             return Container(
               padding: EdgeInsets.fromLTRB(10, 8, 10, 0),
               child: Column(
                 children: <Widget>[
                   Container(
-                    child: Text(info["title"]),
+                    child: Text(info["title"],overflow: TextOverflow.ellipsis,),
                     height: Global.top,
                   ),
                   Expanded(child: txt,),
