@@ -11,7 +11,7 @@ import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
+import 'package:ads/ads.dart';
 
 import 'TitleDetailImp.dart';
 
@@ -48,6 +48,8 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   /// 加载中的上下文引用
   BuildContext loadingCtx;
 
+
+
   
 
 
@@ -57,6 +59,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   @override
   void initState() {
     super.initState();
+    initAd();
     //隐藏状态栏
     SystemChrome.setEnabledSystemUIOverlays([]);
     sqfLiteHelper = new SqfLiteHelper();
@@ -74,9 +77,15 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
     }
     loadeChapter(novelId,currentReadChapterId,0);
   }
+  // 初始化广告
+  void initAd() {
+      Ads.init("ca-app-pub-4020538078469336");
+  }
   @override
   void dispose() {
     super.dispose();
+    Ads.dispose();
+//    myInterstitial.dispose();
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     if(isExist){ //这里代表书架和数据库都要保存
       List args = [];
@@ -105,6 +114,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   }
   @override
   Widget build(BuildContext context) {
+
     Map info = chapterIdAndTitlePages[currentReadChapterId];
     if(pages.length==0){
       //默认返回加载中的图片
@@ -212,6 +222,10 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
             Map info = computeCurrentReadChapterIdAndPage();
             int currentChapterId =info["currentChapterId"];
             page = info["page"];
+            // 当章节是奇数的时候展示广告
+            if(page==0 && currentChapterId%2==1){
+              Ads.showFullScreenAd();
+            }
             // 获取正确的当前章节以后修改全局变量
             if(currentReadChapterId != currentChapterId){
               currentReadChapterId = currentChapterId;
