@@ -85,7 +85,6 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   void dispose() {
     super.dispose();
     Ads.dispose();
-//    myInterstitial.dispose();
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     if(isExist){ //这里代表书架和数据库都要保存
       List args = [];
@@ -110,6 +109,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
         Global.shelfNovels.add(novel);
       }
       sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
+      Global.saveTitle(novelId, []);
     }
   }
   @override
@@ -207,7 +207,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
               child: Column(
                 children: <Widget>[
                   Container(
-                    child: Text(info["title"],overflow: TextOverflow.ellipsis,),
+                    child: Text(info["title"],overflow: TextOverflow.ellipsis,style: TextStyle(color: Global.fontColor),),
                     height: Global.top,
                   ),
                   Expanded(child: txt,),
@@ -333,6 +333,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   }
   /// 字体设置
   void fontSizeSetting() {
+    Navigator.of(context).pop();//弹出模态页
     showModalBottomSheet(context: context,builder: (BuildContext context){
       return Container(
         child: Row(

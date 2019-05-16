@@ -7,7 +7,7 @@ description: 一个免费看小说的app.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.4
+version: 1.0.5
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -31,6 +31,7 @@ dependencies:
   flutter_swiper: ^1.1.6
   auto_size_text: ^1.1.2
   ads: ^0.3.0
+  draggable_scrollbar: ^0.0.4
 #  firebase_admob: ^0.8.0
 
   #  cached_network_image: ^0.5.0

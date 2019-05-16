@@ -7,14 +7,21 @@ import 'package:freenovel/page/BookLibrary.dart';
 import 'package:freenovel/util/EncryptUtil.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
+import 'package:freenovel/util/NovelSqlHelper.dart';
+import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 import 'package:freenovel/views/ChapterDetailPageImp.dart';
+import 'package:freenovel/views/TitleDetailImp.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 typedef InitFn = void Function();
 class Global{
+  /// 求更标志
+  static int updateTime=0;
+
   /// 书库类别标签
   static List<Tab> tabs = [];
   /// 书库类别标签对用的页面
@@ -57,6 +64,8 @@ class Global{
   /// 阅读页面字体颜色
   static Color fontColor = Colors.black;
 
+  static SqfLiteHelper sqfLiteHelper = new SqfLiteHelper();
+
  static void switchTheme(State state){
    if(fontColor==Colors.black){
      fontColor = Colors.blueGrey;
@@ -96,7 +105,7 @@ class Global{
       currentPages[tagid] = 1;
       loadShowNovels(tagid);
     }
-
+    Global.updateTime = prefs.getInt("updateTime")??0;
   }
   static void loadShowNovels(int tagid,{int page=1}) async {
     String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(tagid,page));
@@ -175,5 +184,36 @@ class Global{
     return pages;
   }
 
+  static saveTitle(int novelId,List titles) async{
+    List dbList = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryChaptersByNovelId, [novelId]);
+    String titlesJsonStr;
+    if(dbList!=null && dbList.length!=0 && dbList[dbList.length-1]['chapterId']==dbList.length){//这个判断就是章节在数据库是连续的，不是断断续续的
+      for (int i = 0; i < dbList.length; i++) {
+        var item = dbList[i];
+        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+        titles.add(chapter);
+      }
+      titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: dbList.length));
+    }else{
+      titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: 0));
+    }
+    StringBuffer sb = new StringBuffer();
+    List list = json.decode(titlesJsonStr);
+    if(list!=null && list.length>0){
+      for (int i = 0; i < list.length; i++) {
+        var item = list[i];
+        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+        titles.add(chapter);
+        sb.write("(");
+        sb.write("${item['novelId']},");
+        sb.write("${item['chapterId']},");
+        sb.write("'${item['title']}'");
+        sb.write("),");
+      }
+      String values = sb.toString();
+      values = values.substring(0, values.length - 1);
+      sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
+    }
+  }
 
 }
