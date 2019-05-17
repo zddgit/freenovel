@@ -55,7 +55,7 @@ class SplashPageState extends State<SplashPage> {
           Expanded(
             flex: 6,
             child: Text(
-              "免费阅读",
+              "地瓜阅读",
               style: TextStyle(fontSize: 40.0,fontWeight: FontWeight.w100,color: Color.fromRGBO(51, 181, 229, 1.0)),
             ),),
         ],

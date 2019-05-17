@@ -74,7 +74,7 @@ class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "免费阅读",
+      title: "地瓜阅读",
       home: WillPopScope(
         onWillPop: doubleClickBack,
         child: Scaffold(
