@@ -13,46 +13,49 @@ class Tools {
       itemCount: showNovels.length,
       itemBuilder: (BuildContext context, int index) {
         var novel = showNovels[index];
-        return Card(
-          color: Colors.white70,
-          child: ListTile(
-            leading: Container(
-              width: 50.0,
-              height: 55.0,
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1.0, color: Colors.black38),
-                  borderRadius: BorderRadius.all(Radius.circular(2.0))),
-              child: CoustomCacheImage(novel["id"]),
-            ),
-            title: Text(novel["name"]),
-            subtitle: Text(novel["author"]),
-            trailing: Container(
-                width: 150.0,
+        return Column(
+          children: [
+            ListTile(
+              leading: Container(
+                width: 50.0,
                 height: 55.0,
-                child: Center(
-                    child: Text(
-                  novel["introduction"],
-                  style: TextStyle(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 1.0, color: Colors.black38),
+                    borderRadius: BorderRadius.all(Radius.circular(2.0))),
+                child: CoustomCacheImage(novel["id"]),
+              ),
+              title: Text(novel["name"]),
+              subtitle: Text(novel["author"]),
+              trailing: Container(
+                  width: 150.0,
+                  height: 55.0,
+                  child: Center(
+                      child: Text(
+                        novel["introduction"],
+                        style: TextStyle(
 //                      letterSpacing: 1.0,
-                      height: 1.2,
-                      fontSize: 10.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ))),
-            onTap: () {
-              if (onTap != null) {
-                onTap(index, showNovels, context);
-              }
-            },
-            onLongPress: () {
-              if (onLongPress != null) {
-                onLongPress(index, showNovels, context);
-              }
-            },
-          ),
-        );
+                            height: 1.2,
+                            fontSize: 10.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ))),
+              onTap: () {
+                if (onTap != null) {
+                  onTap(index, showNovels, context);
+                }
+              },
+              onLongPress: () {
+                if (onLongPress != null) {
+                  onLongPress(index, showNovels, context);
+                }
+              },
+            ),
+            Divider(
+            color: Colors.grey,
+            height: 1.0,)
+          ],);
       },
     );
   }
