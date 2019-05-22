@@ -89,7 +89,9 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   @override
   void dispose() {
     super.dispose();
-    myInterstitial.dispose();
+    if(myInterstitial!=null){
+      myInterstitial.dispose();
+    }
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     if(isExist){ //这里代表书架和数据库都要保存
       List args = [];
