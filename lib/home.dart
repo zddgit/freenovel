@@ -134,7 +134,7 @@ class HomeState extends State<Home> {
             Navigator.of(ctx).pop();
           }, child:Text("更新")),
           FlatButton(onPressed: (){
-            Timer.periodic(Duration(seconds: 10), (thiz){
+            Timer.periodic(Duration(minutes: 30), (thiz){
               checkVersion();
               thiz.cancel();
             });
