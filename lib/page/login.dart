@@ -72,7 +72,7 @@ class LoginState extends State<Login> with TickerProviderStateMixin {
 //          Expanded(child: Container(child: FlatButton(child: Image.asset("images/QQ.png"), onPressed: ()=>openQQ(),),height: 30.0,),flex: 1,),
 //        ],),
         Padding(
-          padding: const EdgeInsets.only(top: 8.0,bottom: 15.0),
+          padding: const EdgeInsets.only(top: 2.0,bottom: 2.0),
           child: Text("点击登录代表同意此软件的 使用协议 和 隐私政策",style: TextStyle(color: Colors.grey,fontSize: 12.0),),
         )
       ],),

@@ -1,7 +1,8 @@
 import 'package:freenovel/util/EncryptUtil.dart';
 
 class NovelAPI{
-  static final String baseURI = "http://47.105.67.114:8080/";
+//  static final String baseURI = "http://47.105.67.114:8080/";
+  static final String baseURI = "http://192.168.1.150:8080/";
 //  static final String baseURI = "Http://192.168.1.194:8080/";
 //  static final String baseURI = "Http://172.18.210.1:8080/";
 
@@ -34,6 +35,7 @@ class NovelAPI{
   /// 根据类别获取小说
   static String getNovelsByTag(int tagId,int page)=>baseURI+"getNovelsByTag?tagId=$tagId&page=$page";
 
+  /// 登录或注册
   static String loginOrRegister(String type,String account,String pwd)=>baseURI+"loginOrRegister?type=$type&account=$account&pwd=$pwd";
   /// 签到
   static String signIn(int id,int goldenBean,String verify)=>baseURI+"signIn?id=$id&goldenBean=$goldenBean&verify=$verify";

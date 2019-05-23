@@ -37,10 +37,16 @@ class MySelfState extends State<MySelf> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     if (Global.setting.length == 0) {
       initSetting();
-    } else {
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(Global.setting.length > 0) {
       setting = List()..addAll(Global.setting);
       if (Global.user != null) {
         setting.add({"id": 0, "name": "退出登录"});
@@ -141,9 +147,7 @@ class MySelfState extends State<MySelf> {
               },
               child: ListTile(
                 title: Center(
-                    child: Text(
-                  item["name"],
-                  style: TextStyle(color: Colors.white),
+                    child: Text(item["name"],style: TextStyle(color: Colors.white),
                 )),
               ),
             ),
@@ -202,7 +206,7 @@ class MySelfState extends State<MySelf> {
       case 13:
         if (Global.user != null) {
           var info = Global.user["messages"];
-          return info==null?Container():Container(
+          return info==null?Container(width: 10,):Container(
             width: 20,
             height: 20,
             decoration: BoxDecoration(
@@ -217,7 +221,7 @@ class MySelfState extends State<MySelf> {
             margin: EdgeInsets.only(right: 12.0),
           );
         } else {
-          return Container();
+          return Container(width: 10,);
         }
         break;
       //当前版本

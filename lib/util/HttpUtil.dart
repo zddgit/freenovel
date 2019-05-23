@@ -1,29 +1,36 @@
 import 'dart:convert';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 
 class HttpUtil {
-  static final Dio dio = new Dio();
+  static final Dio dio = new Dio()..interceptors.add(CookieManager(CookieJar()));
   static final Options options = new Options(connectTimeout: 3000,receiveTimeout: 3000);
 
-  static Future<String> get(String url,{Map data}) async {
+  static Future<String> get(String url,{int retry=0,Map data}) async {
+    if(retry>=3){
+      return null;
+    }
     print("get请求："+url);
     String result;
     try{
-      Response response=await dio.get(url,data: data,options: options);
+      Response response=await dio.get(url,queryParameters: data,options: options);
       if(response.statusCode == 200) {
         result = json.encode(response.data);
       }else{
         await Future.delayed(Duration(seconds: 1));
-        result = await get(url,data: data);
+        result = await get(url,data: data,retry: (retry+1));
       }
     }catch(e){
       await Future.delayed(Duration(seconds: 1));
-      result = await get(url,data: data);
+      result = await get(url,data: data,retry: (retry+1));
     }
     return result;
   }
-  static Future<String> post(String url,{Map data}) async {
+  static Future<String> post(String url,{int retry=0,Map data}) async {
+    if(retry>=3){
+      return null;
+    }
     print("post请求："+url);
     String result;
     try{
@@ -32,11 +39,11 @@ class HttpUtil {
           result = json.encode(response.data);
       }else{
         await Future.delayed(Duration(seconds: 1));
-        result = await post(url,data: data);
+        result = await post(url,data: data,retry: (retry+1));
       }
     }catch(e){
       await Future.delayed(Duration(seconds: 1));
-      result = await post(url,data: data);
+      result = await post(url,data: data,retry: (retry+1));
     }
      return result;
   }
