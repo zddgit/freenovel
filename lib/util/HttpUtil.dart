@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HttpUtil {
   static final Dio dio = new Dio()..interceptors.add(CookieManager(CookieJar()));
@@ -9,6 +11,14 @@ class HttpUtil {
 
   static Future<String> get(String url,{int retry=0,Map data}) async {
     if(retry>=3){
+      Fluttertoast.showToast(
+          msg: "网络错误",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 1,
+          backgroundColor:Colors.black,
+          textColor: Colors.white70
+      );
       return null;
     }
     print("get请求："+url);
@@ -29,6 +39,14 @@ class HttpUtil {
   }
   static Future<String> post(String url,{int retry=0,Map data}) async {
     if(retry>=3){
+      Fluttertoast.showToast(
+          msg: "网络错误",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 1,
+          backgroundColor:Colors.black,
+          textColor: Colors.white70
+      );
       return null;
     }
     print("post请求："+url);
