@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:freenovel/views/ChapterDetailPageImp.dart';
-import 'package:freenovel/views/oldpage/CoustomCacheImage.dart';
+import 'package:freenovel/views/CoustomCacheImage.dart';
 
 typedef onTapFn = void Function(int index, List novels, BuildContext context);
-typedef onLongPressFn = void Function(
-    int index, List novels, BuildContext context);
+typedef onLongPressFn = void Function(int index, List novels, BuildContext context);
 
 class Tools {
   static ListView listViewBuilder(var showNovels, {onTapFn onTap, onLongPressFn onLongPress, ScrollController controller}) {
