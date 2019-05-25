@@ -188,9 +188,7 @@ class MySelfState extends State<MySelf> {
       //签到
       case 12:
         String day = Global.prefs.getString("day");
-        if (Global.user != null &&
-            (Tools.nowString() == day ||
-                Global.user["signInTime"] == Tools.nowString())) {
+        if (Global.user != null && (Tools.nowString() == day || Global.user["signInTime"] == Tools.nowString())) {
           return Container(
             child: Image.asset("images/signedIn.png"),
             margin: EdgeInsets.only(right: 12.0),

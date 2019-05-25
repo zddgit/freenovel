@@ -48,11 +48,45 @@ class BookshelfState extends State<Bookshelf> {
       updateColor = Colors.blueGrey;
       updateMessage = "更新完成^_^";
     }
-    Widget widget;
+    List<Widget> widgets;
     if(Global.shelfNovels.length==0){
-      widget = Center(child: Text("你还没有添加小说"),);
+      widgets = [ Expanded(child:Center(child: Text("你还没有添加小说"),), )];
     }else{
-      widget = Tools.listViewBuilder(Global.shelfNovels,onLongPress:_showDelDialog,onTap: Tools.openChapterDetail);
+      widgets= [
+        Expanded( child:Tools.listViewBuilder(Global.shelfNovels,onLongPress:_showDelDialog,onTap: Tools.openChapterDetail), ) ,
+        FlatButton(
+          child: Center(child: Text(updateMessage, style: TextStyle(color: Colors.white),)),
+          color: updateColor,
+          onPressed: () {
+            DateTime now = new DateTime.now();
+            if(Global.updateTime!=now.day){
+              Global.updateTime =now.day;
+              Global.prefs.setInt("updateTime", now.day);
+              Fluttertoast.showToast(
+                  msg: "请稍后，正在更新，😝😝😝",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIos: 1,
+                  backgroundColor:Colors.black,
+                  textColor: Colors.white70
+              );
+              Future.delayed(new Duration(seconds: 1),(){
+                Fluttertoast.showToast(
+                    msg: "更新完成！！！请查看目录",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIos: 1,
+                    backgroundColor:Colors.black,
+                    textColor: Colors.white70
+                );
+                updateColor = Colors.blueGrey;
+                updateMessage = "更新过了😝😝😝";
+                Tools.updateUI(this);
+              });
+            }
+          },)
+      ];
+
     }
     return Scaffold(
       backgroundColor: Colors.white12,
@@ -62,42 +96,7 @@ class BookshelfState extends State<Bookshelf> {
         centerTitle: true,
       ),
       body: Column(
-        children: <Widget>[
-          Expanded(
-            child:widget,
-          ),
-          FlatButton(
-            child: Center(child: Text(updateMessage, style: TextStyle(color: Colors.white),)),
-            color: updateColor,
-            onPressed: () {
-              DateTime now = new DateTime.now();
-              if(Global.updateTime!=now.day){
-                Global.updateTime =now.day;
-                Global.prefs.setInt("updateTime", now.day);
-                Fluttertoast.showToast(
-                    msg: "请稍后，正在更新，😝😝😝",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIos: 1,
-                    backgroundColor:Colors.black,
-                    textColor: Colors.white70
-                );
-                Future.delayed(new Duration(seconds: 1),(){
-                  Fluttertoast.showToast(
-                      msg: "更新完成！！！请查看目录",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIos: 1,
-                      backgroundColor:Colors.black,
-                      textColor: Colors.white70
-                  );
-                  updateColor = Colors.blueGrey;
-                  updateMessage = "更新过了😝😝😝";
-                  Tools.updateUI(this);
-                });
-              }
-            },)
-        ],
+        children: widgets,
       ),
     );
   }

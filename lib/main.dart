@@ -10,6 +10,5 @@ class MyAPp extends StatelessWidget{
       home: SplashPage(),
     );
   }
-
 }
 //WillPopScope

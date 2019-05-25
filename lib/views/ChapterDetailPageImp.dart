@@ -11,7 +11,7 @@ import 'package:freenovel/util/NovelSqlHelper.dart';
 import 'package:freenovel/util/SqlfliteHelper.dart';
 import 'package:freenovel/util/Tools.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+//import 'package:firebase_admob/firebase_admob.dart';
 
 import 'TitleDetailImp.dart';
 
@@ -49,7 +49,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   BuildContext loadingCtx;
 
 
-  InterstitialAd myInterstitial;
+//  InterstitialAd myInterstitial;
   
 
 
@@ -78,20 +78,20 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
   }
   // 初始化广告
   void initAd() {
-      myInterstitial = InterstitialAd(
-//          adUnitId: InterstitialAd.testAdUnitId,
-          adUnitId: "ca-app-pub-4020538078469336~3932467116",
-//          targetingInfo: targetingInfo,
-          listener: (MobileAdEvent event) {
-          print("InterstitialAd event is $event");
-      },);
+//      myInterstitial = InterstitialAd(
+////          adUnitId: InterstitialAd.testAdUnitId,
+//          adUnitId: "ca-app-pub-4020538078469336~3932467116",
+////          targetingInfo: targetingInfo,
+//          listener: (MobileAdEvent event) {
+//          print("InterstitialAd event is $event");
+//      },);
   }
   @override
   void dispose() {
     super.dispose();
-    if(myInterstitial!=null){
-      myInterstitial.dispose();
-    }
+//    if(myInterstitial!=null){
+//      myInterstitial.dispose();
+//    }
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     if(isExist){ //这里代表书架和数据库都要保存
       List args = [];
@@ -116,7 +116,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
         Global.shelfNovels.add(novel);
       }
       sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.saveNovel, args);
-      Global.saveTitle(novelId, []);
+//      Global.saveTitle(novelId, []);
     }
   }
   @override
@@ -232,7 +232,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
             // 当章节是奇数的时候展示广告
             if(page==0 && currentChapterId%2==1){
               initAd();
-              myInterstitial..load()..show();
+//              myInterstitial..load()..show();
             }
             // 获取正确的当前章节以后修改全局变量
             if(currentReadChapterId != currentChapterId){

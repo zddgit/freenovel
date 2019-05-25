@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class HttpUtil {
   static final Dio dio = new Dio()..interceptors.add(CookieManager(CookieJar()));
-  static final Options options = new Options(connectTimeout: 3000,receiveTimeout: 3000);
+  static final Options options = new Options(connectTimeout: 5000,receiveTimeout: 5000,followRedirects: true);
 
   static Future<String> get(String url,{int retry=0,Map data}) async {
     if(retry>=3){
