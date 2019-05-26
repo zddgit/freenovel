@@ -135,6 +135,12 @@ class Global{
   static List<String> initPage(double width,double height,double padding,double fontSize,String data){
     List<String> pages = new List<String>();
     int lineWordCount = ((width-padding)/fontSize).floor();
+    data = data.replaceAll(" ", "");
+    data = data.replaceAll("\n", ".");
+    RegExp exp = new RegExp(r"(\.+)");
+    data = data.replaceAll(exp, "。");
+    RegExp exp1 = new RegExp(r"(。+)");
+    data = data.replaceAll(exp1, "。");
     List<String> details = data.split("。");
     StringBuffer content = new StringBuffer();
     int total = (height*4/(fontSize*6)).floor()-1;
