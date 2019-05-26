@@ -123,11 +123,13 @@ class HomeState extends State<Home> {
 
   void checkVersion() async{
     DateTime dt = DateTime.now();
-    if(Global.user["lastLoginTime"]-Global.user["expireDate"]>0 && dt.hour>1 && dt.hour<5){
-      Fluttertoast.showToast(msg: "夜太深了，洗洗睡吧！系统维护1点到5点");
-      Future.delayed(Duration(seconds: 1),(){
-          SystemNavigator.pop();
-      });
+    if((dt.hour>1 && dt.hour<5)){
+      if(Global.user==null || Global.user["lastLoginTime"]-Global.user["expireDate"] > 0 ){
+        Fluttertoast.showToast(msg: "系统维护，请稍后再试！");
+        Future.delayed(Duration(seconds: 1),(){
+            SystemNavigator.pop();
+        });
+      }
     }
     String  version = await HttpUtil.get(NovelAPI.checkVersion());
     version = version.substring(1,version.length-1);
