@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/login.dart';
@@ -228,6 +229,25 @@ class MySelfState extends State<MySelf> {
           child: Text(Global.version),
           margin: EdgeInsets.only(right: 12.0),
         );
+        break;
+    //群号复制
+      case 19:
+        return GestureDetector(
+          onLongPress: (){
+            Clipboard.setData(new ClipboardData(text: "660641017"));
+            Fluttertoast.showToast(
+                msg: "群号已复制",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIos: 1,
+                backgroundColor:Colors.black,
+                textColor: Colors.white70
+            );
+          },
+          child: Container(
+            child: Text("660641017"),
+            margin: EdgeInsets.only(right: 12.0),
+        ),);
         break;
       default:
         return Icon(Icons.keyboard_arrow_right);

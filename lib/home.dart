@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/BookLibrary.dart';
@@ -121,6 +122,13 @@ class HomeState extends State<Home> {
   }
 
   void checkVersion() async{
+    DateTime dt = DateTime.now();
+    if(Global.user["lastLoginTime"]-Global.user["expireDate"]>0 && dt.hour>1 && dt.hour<5){
+      Fluttertoast.showToast(msg: "夜太深了，洗洗睡吧！");
+      Future.delayed(Duration(seconds: 1),(){
+          SystemNavigator.pop();
+      });
+    }
     String  version = await HttpUtil.get(NovelAPI.checkVersion());
     version = version.substring(1,version.length-1);
     if(version!=Global.version){
