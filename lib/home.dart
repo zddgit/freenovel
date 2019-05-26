@@ -124,7 +124,7 @@ class HomeState extends State<Home> {
   void checkVersion() async{
     DateTime dt = DateTime.now();
     if(Global.user["lastLoginTime"]-Global.user["expireDate"]>0 && dt.hour>1 && dt.hour<5){
-      Fluttertoast.showToast(msg: "夜太深了，洗洗睡吧！");
+      Fluttertoast.showToast(msg: "夜太深了，洗洗睡吧！系统维护1点到5点");
       Future.delayed(Duration(seconds: 1),(){
           SystemNavigator.pop();
       });
