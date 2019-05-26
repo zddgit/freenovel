@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/page/booksearch.dart';
 import 'package:freenovel/util/HttpUtil.dart';
@@ -30,10 +29,17 @@ class BookLibraryState extends State<BookLibrary>
   @override
   void initState() {
     super.initState();
-
     queryName = "";
     scrollController = ScrollController();
+    if(Global.tabs.length==0){
+      initTabs();
+    }
     _controller = TabController(length: Global.tabs.length, vsync: this);
+  }
+  void initTabs() async{
+   await Global.initTabs();
+   _controller = TabController(length: Global.tabs.length, vsync: this);
+   Tools.updateUI(this);
   }
 
   getSearchNovels(String name, {page = 1}) async {
@@ -48,6 +54,20 @@ class BookLibraryState extends State<BookLibrary>
 
   @override
   Widget build(BuildContext context) {
+    Widget tabBar = Container(),tabBarView = Container();
+    if(Global.tabs.length>0){
+      tabBar= TabBar(
+        indicatorColor: Colors.white,
+        tabs: Global.tabs,
+        isScrollable: true,
+        controller: _controller,
+      );
+      tabBarView =  TabBarView(
+        controller: _controller,
+        children: Global.pages,
+      );
+
+    }
     return Scaffold(
         floatingActionButton: new FloatingActionButton(
           onPressed: () {
@@ -58,18 +78,10 @@ class BookLibraryState extends State<BookLibrary>
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: TabBar(
-              indicatorColor: Colors.white,
-              tabs: Global.tabs,
-              isScrollable: true,
-              controller: _controller,
-            ),
+            child: tabBar,
           ),
         ),
-        body: TabBarView(
-          controller: _controller,
-          children: Global.pages,
-        ));
+        body:tabBarView);
   }
 }
 

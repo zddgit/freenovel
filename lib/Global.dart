@@ -91,11 +91,16 @@ class Global{
     Directory tempDir = await getTemporaryDirectory();
     cacheImgPath = tempDir.path;
     fn();
-    /// 首先初始化tabs
-    String tags = await HttpUtil.get(NovelAPI.getTags());
-    List list = json.decode(tags);
     autoLogin();
     initVsersion();
+    initTabs();
+
+    Global.updateTime = prefs.getInt("updateTime")??0;
+  }
+  /// 首先初始化tabs
+  static initTabs() async {
+    String tags = await HttpUtil.get(NovelAPI.getTags());
+    List list = json.decode(tags);
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
       tabs.add(Tab(text: item["name"]));
@@ -105,7 +110,6 @@ class Global{
       currentPages[tagid] = 1;
       loadShowNovels(tagid);
     }
-    Global.updateTime = prefs.getInt("updateTime")??0;
   }
   static void loadShowNovels(int tagid,{int page=1}) async {
     String novels = await HttpUtil.get(NovelAPI.getNovelsByTag(tagid,page));
