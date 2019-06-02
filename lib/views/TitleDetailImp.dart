@@ -82,13 +82,11 @@ class TitleDetailStateImp extends State<TitleDetailImp> {
   }
 
   void getTitle() async{
-    await Global.saveTitle(novelId, titles);
-    Tools.updateUI(this);
-    Future.delayed(Duration(milliseconds: 50),(){
-      scrollController.jumpTo((chapterId-1)*50.toDouble());
+    await Global.saveTitle(novelId, titles,this,fn:(){
+      Future.delayed(Duration(milliseconds: 50),(){
+        scrollController.jumpTo((chapterId-1)*50.toDouble());
+      });
     });
-
-
   }
 
 }

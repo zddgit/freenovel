@@ -194,14 +194,16 @@ class Global{
     return pages;
   }
 
-  static saveTitle(int novelId,List titles) async{
+  static saveTitle(int novelId,List titles,State state,{fn}) async{
     List dbList = await sqfLiteHelper.query(NovelSqlHelper.databaseName,NovelSqlHelper.queryChaptersByNovelId, [novelId]);
     String titlesJsonStr;
     if(dbList!=null && dbList.length!=0 && dbList[dbList.length-1]['chapterId']==dbList.length){//这个判断就是章节在数据库是连续的，不是断断续续的
-      for (int i = 0; i < dbList.length; i++) {
-        var item = dbList[i];
-        Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
-        titles.add(chapter);
+      if(titles.length==0){
+        for (int i = 0; i < dbList.length; i++) {
+          var item = dbList[i];
+          Chapter chapter = Chapter(item['chapterId'], item['novelId'], item['title']);
+          titles.add(chapter);
+        }
       }
       titlesJsonStr = await HttpUtil.get(NovelAPI.getTitles(novelId,limit: dbList.length));
     }else{
@@ -223,7 +225,19 @@ class Global{
       String values = sb.toString();
       values = values.substring(0, values.length - 1);
       sqfLiteHelper.insert(NovelSqlHelper.databaseName, NovelSqlHelper.batchSaveChapter+values);
+      Tools.updateUI(state);
+      if(state.mounted){
+        if(fn!=null){
+          fn();
+        }
+        new Future.delayed(new Duration(milliseconds: 1500),(){
+          saveTitle(novelId,titles,state);
+        });
+      }
+    }else{
+      Tools.updateUI(state);
     }
+
   }
 
 }
