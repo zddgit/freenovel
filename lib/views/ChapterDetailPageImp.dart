@@ -279,6 +279,8 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
     }
     info["length"] = pages.length;
     if(type==0){//初始化
+      chapterIdAndTitlePages.clear();
+      totalPages.clear();
       totalPages.addAll(pages);
       // 向前多加载一章
       if(chapterId>1 && page==0){

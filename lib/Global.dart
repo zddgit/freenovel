@@ -78,12 +78,12 @@ class Global{
  }
   static void switchFontSize(ChapterDetailPageImpState state,int size){
     fontSize = fontSize + size;
-    // 上一次处于那一章的头
-    if(state.page==0){
-      state.currentIndex = state.page;
-    }else{
-      state.currentIndex = state.page-size.abs();
+    prefs.setInt("fontsize", fontSize.toInt());
+    // 上一次没有处于第一页
+    if(state.page!=0){
+      state.page = state.page-size.abs();
     }
+    state.currentIndex = state.page;
     state.loadeChapter(state.novelId, state.currentReadChapterId, 0);
   }
   static void init(InitFn fn) async{
@@ -94,7 +94,6 @@ class Global{
     autoLogin();
     initVsersion();
     initTabs();
-
     Global.updateTime = prefs.getInt("updateTime")??0;
   }
   /// 首先初始化tabs
@@ -143,7 +142,7 @@ class Global{
     data = data.replaceAll(exp1, "。");
     List<String> details = data.split("。");
     StringBuffer content = new StringBuffer();
-    int total = (height*4/(fontSize*6)).floor()-1;
+    int total = (height*4/(fontSize*6)).floor();
     int pageLines = 0;
     for(int i = 0;i<details.length;i++){
       String raw = details.elementAt(i).trim();
@@ -166,10 +165,21 @@ class Global{
             page = page.substring(2);
           }
           pages.add(page);
+          pageLines = 0;
           content = new StringBuffer();
           if (!line.endsWith("。")){
             item = raw.replaceAll(line, "");
             lines = (item.length/lineWordCount).ceil();
+            //这里要判断行号大于total的情况。
+            int m = (lines/total).floor();
+            if(m!=0){
+              for(int n = 1;n<=m;n++){
+                page = item.substring(0,n*total*lineWordCount);
+                pages.add(page);
+                item = item.replaceAll(page, "");
+              }
+              lines = (item.length/lineWordCount).ceil();
+            }
             content.write(item);
           }
         }else{
@@ -178,6 +188,7 @@ class Global{
             page = page.substring(2);
           }
           pages.add(page);
+          pageLines = 0;
           content = new StringBuffer();
           content.write(item);
         }
@@ -187,10 +198,13 @@ class Global{
       }
     }
     String page = content.toString();
-    if(page.startsWith("\n")){
-      page = page.substring(2);
+    String s = page.replaceAll("\n", "");
+    if(s.replaceAll(" ", "").length!=0){
+      if(page.startsWith("\n")){
+        page = page.substring(2);
+      }
+      pages.add(page);
     }
-    pages.add(page);
     return pages;
   }
 
