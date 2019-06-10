@@ -39,17 +39,29 @@ class CoustomCacheImageState extends State<CoustomCacheImage>{
 
   @override
   Widget build(BuildContext context) {
+
     return Container(child: child,);
 
   }
 
   initChild() async {
     String imgpath = join(Global.cacheImgPath, "$novelId.jpg");
-    if (!(await File(imgpath).exists())) {
-        await HttpUtil.download(NovelAPI.getImage(novelId), imgpath);
-    }
-    child = Image.file(File(imgpath),fit: BoxFit.cover,);
-    Tools.updateUI(this);
+      if (!(await File(imgpath).exists())) {
+          await HttpUtil.download(NovelAPI.getImage(novelId), imgpath);
+      }
+      File file = File(imgpath);
+      int i = await file.length();
+      print(imgpath +":"+i.toString());
+      Image image = Image.file(file,fit: BoxFit.cover,);
+      // 此方法主要是用来在图片加载失败以后，添加默认小部件
+      ImageStream stream = image.image.resolve(ImageConfiguration.empty);
+      stream.addListener((_,__){//成功回调
+          child = image;
+          Tools.updateUI(this);
+      }, onError: (dynamic exception, StackTrace stackTrace) {//失败回调
+          child = Center(child: Text("封面"),);
+          Tools.updateUI(this);
+      });
 
   }
 
