@@ -166,11 +166,8 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
             return Future.value(true);
           }
         },
-        child: new Swiper(
-          key: new GlobalKey(),// new一个key，保证每一次build生成的都是新的小组件
-          index: currentIndex,
-          loop: false,
-          onTap: (index){
+        child: GestureDetector(
+          onLongPress: (){
             showModalBottomSheet(context: context,builder: (BuildContext context) {
               return Container(
                 height: 100,
@@ -189,70 +186,74 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
                       activeIcon: Icon(Icons.arrow_back),
                     ),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.list),
-                        title: Text("目录"),
-                        activeIcon: Icon(Icons.list),
+                      icon: Icon(Icons.list),
+                      title: Text("目录"),
+                      activeIcon: Icon(Icons.list),
                     ),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.wb_sunny),
-                        title: Text("日间"),
-                        activeIcon: Icon(Icons.brightness_2),
+                      icon: Icon(Icons.wb_sunny),
+                      title: Text("日间"),
+                      activeIcon: Icon(Icons.brightness_2),
                     ),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.text_format),
-                        title: Text("设置"),
-                        activeIcon: Icon(Icons.text_format),
-                        ),
+                      icon: Icon(Icons.text_format),
+                      title: Text("设置"),
+                      activeIcon: Icon(Icons.text_format),
+                    ),
                   ],),
               );
             });
           },
-          itemBuilder: (BuildContext context, int index) {
-            Widget txt = AutoSizeText( totalPages[index], style: TextStyle(fontSize: Global.fontSize, height: 1.1,color: Global.fontColor),);
-            return Container(
-              padding: EdgeInsets.fromLTRB(10, 8, 10, 0),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    child: Text(info["title"],overflow: TextOverflow.ellipsis,style: TextStyle(color: Global.fontColor),),
-                    height: Global.top,
-                  ),
-                  Expanded(child: txt,),
-                ],
-              ),
-            );
-          },
-          itemCount: totalPages.length,
-          onIndexChanged: (index){
-            currentIndex = index;
-            // 实时计算当前所处于那页
-            Map info = computeCurrentReadChapterIdAndPage();
-            int currentChapterId =info["currentChapterId"];
-            page = info["page"];
-            // 当章节是奇数的时候展示广告
-            if(page==0 && currentChapterId%2==1){
-              initAd();
-//              myInterstitial..load()..show();
-            }
-            // 获取正确的当前章节以后修改全局变量
-            if(currentReadChapterId != currentChapterId){
-              currentReadChapterId = currentChapterId;
-              Tools.updateUI(this);
-            }
-            if(index==(totalPages.length-1)){
-              showLoading();
-              // 加载下一章
-              loadeChapter(novelId,currentReadChapterId+1,1,fn:cancleLoading);
-            }
-            if(index==0){
-              // 加载上一章
-              if((currentReadChapterId-1)>0){
-                showLoading();
-                loadeChapter(novelId,currentReadChapterId-1,-1,fn:cancleLoading);
+          child: new Swiper(
+            key: new GlobalKey(),// new一个key，保证每一次build生成的都是新的小组件
+            index: currentIndex,
+            loop: false,
+            itemBuilder: (BuildContext context, int index) {
+              Widget txt = AutoSizeText( totalPages[index], style: TextStyle(fontSize: Global.fontSize, height: 1.1,color: Global.fontColor),);
+              return Container(
+                padding: EdgeInsets.fromLTRB(10, 8, 10, 0),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Text(info["title"],overflow: TextOverflow.ellipsis,style: TextStyle(color: Global.fontColor),),
+                      height: Global.top,
+                    ),
+                    Expanded(child: txt,),
+                  ],
+                ),
+              );
+            },
+            itemCount: totalPages.length,
+            onIndexChanged: (index){
+              currentIndex = index;
+              // 实时计算当前所处于那页
+              Map info = computeCurrentReadChapterIdAndPage();
+              int currentChapterId =info["currentChapterId"];
+              page = info["page"];
+              // 当章节是奇数的时候展示广告
+              if(page==0 && currentChapterId%2==1){
+                initAd();
+  //              myInterstitial..load()..show();
               }
-            }
-          },
-        ),
+              // 获取正确的当前章节以后修改全局变量
+              if(currentReadChapterId != currentChapterId){
+                currentReadChapterId = currentChapterId;
+                Tools.updateUI(this);
+              }
+              if(index==(totalPages.length-1)){
+                showLoading();
+                // 加载下一章
+                loadeChapter(novelId,currentReadChapterId+1,1,fn:cancleLoading);
+              }
+              if(index==0){
+                // 加载上一章
+                if((currentReadChapterId-1)>0){
+                  showLoading();
+                  loadeChapter(novelId,currentReadChapterId-1,-1,fn:cancleLoading);
+                }
+              }
+            },
+        ),),
       ),
     );
   }
