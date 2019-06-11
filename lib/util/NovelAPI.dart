@@ -4,7 +4,7 @@ class NovelAPI{
   static final String baseURI = "http://4s.net579.com:23641/";
 //  static final String baseURI = "http://47.105.67.114:8080/";
 //  static final String baseURI = "http://192.168.1.150:8080/";
-//  static final String baseURI = "Http://192.168.2.111:80/";
+//  static final String baseURI = "http://192.168.2.111:8080/";
 //  static final String baseURI = "Http://172.18.210.1:8080/";
 
   /// 获取小说目录
@@ -19,8 +19,7 @@ class NovelAPI{
     return baseURI+"getNovelDetail/$nid/$cid";
   }
 
-  /// 获取小说信息
-  static String getNovel(int novelId)=>baseURI+"getNovel/$novelId";
+
   /// 获取小说封面
   static String getImage(int novelId){
     String nid= EncryptUtil.encryptInt(novelId);
