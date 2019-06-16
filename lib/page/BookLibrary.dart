@@ -137,16 +137,18 @@ class LibraryPageState extends State<LibraryPage>
       padding: const EdgeInsets.all(8.0),
       child: LoadMore(
         isFinish: isFinish,
-        onLoadMore: loadMoreChapter,
+        onLoadMore: loadMoreNovel,
         child: Tools.listViewBuilder(Global.map[_tagid],
             controller: scrollController, onTap: Tools.openChapterDetail),
       ),
     );
   }
-  Future<bool> loadMoreChapter() async{
-    currentPage++;
-    isFinish = true;
-    await loadShowNovels(_tagid, currentPage);
+  Future<bool> loadMoreNovel() async{
+    if(!isFinish){
+      currentPage++;
+      isFinish = true;
+      await loadShowNovels(_tagid, currentPage);
+    }
     await Future.delayed(Duration(milliseconds: 100));
     return true;
   }

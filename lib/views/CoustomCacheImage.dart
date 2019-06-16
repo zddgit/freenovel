@@ -50,9 +50,7 @@ class CoustomCacheImageState extends State<CoustomCacheImage>{
           await HttpUtil.download(NovelAPI.getImage(novelId), imgpath);
       }
       File file = File(imgpath);
-      int i = await file.length();
-      print(imgpath +":"+i.toString());
-      Image image = Image.file(file,fit: BoxFit.cover,);
+      Image image = Image.file(file,fit: BoxFit.cover,width: 80,height: 100,);
       // 此方法主要是用来在图片加载失败以后，添加默认小部件
       ImageStream stream = image.image.resolve(ImageConfiguration.empty);
       stream.addListener((_,__){//成功回调

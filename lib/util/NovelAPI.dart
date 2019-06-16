@@ -5,7 +5,6 @@ class NovelAPI{
 //  static final String baseURI = "http://47.105.67.114:8080/";
 //  static final String baseURI = "http://192.168.1.150:8080/";
 //  static final String baseURI = "http://192.168.2.111:8080/";
-//  static final String baseURI = "Http://172.18.210.1:8080/";
 
   /// 获取小说目录
   static String getTitles(int novelId,{int limit =0}){

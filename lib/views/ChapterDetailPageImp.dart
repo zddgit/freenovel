@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:freenovel/Global.dart';
 import 'package:freenovel/util/HttpUtil.dart';
 import 'package:freenovel/util/NovelAPI.dart';
@@ -269,6 +270,18 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
       /// 手机数据库没有数据,从网络获取
       String content = await HttpUtil.get(NovelAPI.getNovelDetail(novelId, chapterId));
       var result = json.decode(content);
+      if(result["code"].toString()=="-1"){
+        cancleLoading();
+        Fluttertoast.showToast(
+            msg: "已是最新章节！请稍后再试!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 1,
+            backgroundColor:Colors.black,
+            textColor: Colors.white70
+        );
+        return;
+      }
       content = result["content_str"];
       String title = result["title"];
       /// 判断需不需要保存到数据库

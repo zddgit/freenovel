@@ -21,7 +21,7 @@ class HttpUtil {
       );
       return null;
     }
-    print("get请求："+url);
+//    print("get请求："+url);
     String result;
     try{
       Response response=await dio.get(url,queryParameters: data,options: options);
@@ -49,7 +49,7 @@ class HttpUtil {
       );
       return null;
     }
-    print("post请求："+url);
+//    print("post请求："+url);
     String result;
     try{
       Response response=await dio.post(url,data: data,options: options);
@@ -66,7 +66,7 @@ class HttpUtil {
      return result;
   }
   static download(String url,String savePath) async{
-    print("download请求：$url");
+//    print("download请求：$url");
     await dio.download(url, savePath);
   }
 

@@ -16,9 +16,9 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="地瓜阅读"
         android:icon="@mipmap/icon_logo">
-        <meta-data
-                android:name="com.google.android.gms.ads.APPLICATION_ID"
-                android:value="ca-app-pub-4020538078469336~3932467116"/>
+        <!--<meta-data-->
+                <!--android:name="com.google.android.gms.ads.APPLICATION_ID"-->
+                <!--android:value="ca-app-pub-4020538078469336~3932467116"/>-->
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
