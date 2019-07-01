@@ -168,7 +168,7 @@ class ChapterDetailPageImpState extends State<ChapterDetailPageImp>{
           }
         },
         child: GestureDetector(
-          onLongPress: (){
+          onTap: (){
             showModalBottomSheet(context: context,builder: (BuildContext context) {
               return Container(
                 height: 100,
