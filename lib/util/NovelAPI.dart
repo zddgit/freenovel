@@ -2,7 +2,7 @@ import 'package:freenovel/util/EncryptUtil.dart';
 
 class NovelAPI{
 //  static final String baseURI = "http://4s.net579.com:23641/";
-  static final String baseURI = "http://novels.nat123.cc:10000/";
+  static final String baseURI = "http://novels.nat123.cc:30689/";
 //  static final String baseURI = "http://47.105.67.114:8080/";
 //  static final String baseURI = "http://192.168.1.150:8080/";
 //  static final String baseURI = "http://192.168.2.111:8080/";
